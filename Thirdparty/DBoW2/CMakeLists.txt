@@ -1,36 +1,41 @@
 cmake_minimum_required(VERSION 2.8)
 project(DBoW2)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall  -O3 -march=native ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -O3 -march=native")
+# message(STATUS "-----------CMAKE_C_FLAGS:${CMAKE_C_FLAGS}")
+# message(STATUS "-----------CMAKE_CXX_FLAGS:${CMAKE_CXX_FLAGS}")
+
+set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11")
 
 set(HDRS_DBOW2
-  DBoW2/BowVector.h
-  DBoW2/FORB.h 
-  DBoW2/FClass.h       
-  DBoW2/FeatureVector.h
-  DBoW2/ScoringObject.h   
-  DBoW2/TemplatedVocabulary.h)
+        DBoW2/BowVector.h
+        DBoW2/FORB.h
+        DBoW2/FClass.h
+        DBoW2/FeatureVector.h
+        DBoW2/ScoringObject.h
+        DBoW2/TemplatedVocabulary.h)
 set(SRCS_DBOW2
-  DBoW2/BowVector.cpp
-  DBoW2/FORB.cpp      
-  DBoW2/FeatureVector.cpp
-  DBoW2/ScoringObject.cpp)
+        DBoW2/BowVector.cpp
+        DBoW2/FORB.cpp
+        DBoW2/FeatureVector.cpp
+        DBoW2/ScoringObject.cpp)
 
 set(HDRS_DUTILS
-  DUtils/Random.h
-  DUtils/Timestamp.h)
+        DUtils/Random.h
+        DUtils/Timestamp.h)
 set(SRCS_DUTILS
-  DUtils/Random.cpp
-  DUtils/Timestamp.cpp)
+        DUtils/Random.cpp
+        DUtils/Timestamp.cpp)
 
-find_package(OpenCV 3.0 QUIET)
-if(NOT OpenCV_FOUND)
-   find_package(OpenCV 2.4.3 QUIET)
-   if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
-   endif()
-endif()
+find_package(OpenCV 3.2.0 EXACT REQUIRED)
+message("-----------OpenCV_VERSION:${OpenCV_VERSION}")
+
+# if(NOT OpenCV_FOUND)
+#    find_package(OpenCV 2.4.3 QUIET)
+#    if(NOT OpenCV_FOUND)
+#       message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
+#    endif()
+# endif()
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
