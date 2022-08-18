@@ -280,10 +280,7 @@ namespace ORB_SLAM2 {
         unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
 
         if (mState == NOT_INITIALIZED) {
-            if (mSensor == System::STEREO || mSensor == System::RGBD)
-                StereoInitialization();                                                     // RGBD第一帧初始化
-            else
-                MonocularInitialization();
+            StereoInitialization();                                                     // RGBD第一帧初始化
 
             mpFrameDrawer->Update(this);
 
