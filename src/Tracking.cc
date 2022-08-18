@@ -282,6 +282,10 @@ namespace ORB_SLAM2 {
         if (mState == NOT_INITIALIZED) {
             StereoInitialization();                                                     // RGBD第一帧初始化
 
+
+
+
+
             mpFrameDrawer->Update(this);
 
             if (mState != OK)
