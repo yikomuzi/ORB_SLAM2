@@ -137,8 +137,12 @@ namespace ORB_SLAM2 {
             mlNewKeyFrames.pop_front();
         }
 
+//        while (true);
+
         // Compute Bags of Words structures
-        mpCurrentKeyFrame->ComputeBoW();
+        mpCurrentKeyFrame->ComputeBoW();  // 关键代码，只有这行运行以后第二帧才能继续
+
+//        while (true);
 
         // Associate MapPoints to the new keyframe and update normal and descriptor
         const vector<MapPoint *> vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();

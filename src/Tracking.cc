@@ -494,6 +494,8 @@ namespace ORB_SLAM2 {
 
         int nmatches = matcher.SearchByBoW(mpReferenceKF, mCurrentFrame, vpMapPointMatches);
 
+        cout << "[Tracking] TrackReferenceKeyFrame nmatches: " << nmatches << endl;
+
         if (nmatches < 15)
             return false;
 
