@@ -177,7 +177,7 @@ namespace ORB_SLAM2 {
         Initializer *mpInitializer;
 
         // Local Map
-        KeyFrame *mpReferenceKF;
+        KeyFrame *mpReferenceKF;  // 参考关键帧
         std::vector<KeyFrame *> mvpLocalKeyFrames;
         std::vector<MapPoint *> mvpLocalMapPoints;
 

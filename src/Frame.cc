@@ -301,7 +301,7 @@ namespace ORB_SLAM2 {
         return true;
     }
 
-    void Frame::ComputeBoW() {
+    void Frame::ComputeBoW() {  // 计算mBowVec和mFeatVec
         if (mBowVec.empty()) {
             vector<cv::Mat> vCurrentDesc = Converter::toDescriptorVector(mDescriptors);
             mpORBvocabulary->transform(vCurrentDesc, mBowVec, mFeatVec, 4);

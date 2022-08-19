@@ -392,12 +392,14 @@ namespace ORB_SLAM2 {
 
         // Store frame pose information to retrieve the complete camera trajectory afterwards.
         if (!mCurrentFrame.mTcw.empty()) {
+            cout << "[Tracking]Track mCurrentFrame.mTcw not empty-----------" << endl;
             cv::Mat Tcr = mCurrentFrame.mTcw * mCurrentFrame.mpReferenceKF->GetPoseInverse();
             mlRelativeFramePoses.push_back(Tcr);
             mlpReferences.push_back(mpReferenceKF);
             mlFrameTimes.push_back(mCurrentFrame.mTimeStamp);
             mlbLost.push_back(mState == LOST);
         } else {
+            cout << "[Tracking]Track mCurrentFrame.mTcw empty-----------" << endl;
             // This can happen if tracking is lost
             mlRelativeFramePoses.push_back(mlRelativeFramePoses.back());
             mlpReferences.push_back(mlpReferences.back());
@@ -456,7 +458,7 @@ namespace ORB_SLAM2 {
 
             mvpLocalKeyFrames.push_back(pKFini);
             mvpLocalMapPoints = mpMap->GetAllMapPoints();
-            mpReferenceKF = pKFini;  // 设置参考关键帧
+            mpReferenceKF = pKFini;  // 设置参考关键帧, 在第二帧根据参考关键帧中使用
             mCurrentFrame.mpReferenceKF = pKFini;
 
             mpMap->SetReferenceMapPoints(mvpLocalMapPoints);
