@@ -390,6 +390,8 @@ namespace ORB_SLAM2 {
             mLastFrame = Frame(mCurrentFrame);
         }
 
+
+
         // Store frame pose information to retrieve the complete camera trajectory afterwards.
         if (!mCurrentFrame.mTcw.empty()) {
             cout << "[Tracking]Track mCurrentFrame.mTcw not empty-----------" << endl;
