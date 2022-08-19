@@ -454,6 +454,8 @@ namespace ORB_SLAM2 {
 
 //            mpLocalMapper->InsertKeyFrame(pKFini);  // 局部建图线程启动
 
+
+            // 从这里开始当前帧mCurrentFrame已经处理结束，对下一帧进行准备，第一帧变为上一帧，设置参考关键帧
             mLastFrame = Frame(mCurrentFrame);
             mnLastKeyFrameId = mCurrentFrame.mnId;
             mpLastKeyFrame = pKFini;
