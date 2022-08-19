@@ -44,7 +44,7 @@ namespace ORB_SLAM2 {
 
         mbFinished = false;
 
-//        while (true) {}
+        while (true) {}
 
         while (1) {
 //            cout << "[info] LocalMapping::Run() while (1) begin------------------" << endl;

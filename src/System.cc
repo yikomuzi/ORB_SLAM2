@@ -86,8 +86,8 @@ namespace ORB_SLAM2 {
                                  mpMap, mpKeyFrameDatabase, strSettingsFile, mSensor);
 
         // 局部建图线程   Initialize the Local Mapping thread and launch
-        mpLocalMapper = new LocalMapping(mpMap, mSensor == MONOCULAR);
-        mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run, mpLocalMapper);
+//        mpLocalMapper = new LocalMapping(mpMap, mSensor == MONOCULAR);
+//        mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run, mpLocalMapper);
 
         // 闭环检测线程   Initialize the Loop Closing thread and launch
 //        mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor != MONOCULAR);
@@ -101,10 +101,10 @@ namespace ORB_SLAM2 {
         }
 
         // Set pointers between threads
-        mpTracker->SetLocalMapper(mpLocalMapper);
+//        mpTracker->SetLocalMapper(mpLocalMapper);
 //        mpTracker->SetLoopClosing(mpLoopCloser);
 
-        mpLocalMapper->SetTracker(mpTracker);
+//        mpLocalMapper->SetTracker(mpTracker);
 //        mpLocalMapper->SetLoopCloser(mpLoopCloser);
 
 //        mpLoopCloser->SetTracker(mpTracker);
