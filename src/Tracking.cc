@@ -234,93 +234,22 @@ namespace ORB_SLAM2 {
             // System is initialized. Track Frame.
             bool bOK;
 
-            // Initial camera pose estimation using motion model or relocalization (if tracking is lost)
-            if (!mbOnlyTracking) {
-                // Local Mapping is activated. This is the normal behaviour, unless
-                // you explicitly activate the "only tracking" mode.
+            // Local Mapping might have changed some MapPoints tracked in last frame
+            CheckReplacedInLastFrame();
 
-                if (mState == OK) {
-                    // Local Mapping might have changed some MapPoints tracked in last frame
-                    CheckReplacedInLastFrame();
-
-                    if (mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2) {
-                        bOK = TrackReferenceKeyFrame();                 // 根据参考帧进行跟踪
-                    } else {
-                        bOK = TrackWithMotionModel();                   // 根据运动模型跟踪
-                        if (!bOK)
-                            bOK = TrackReferenceKeyFrame();             // 运动模型跟踪失败,根据参考帧进行跟踪
-                    }
-                } else {
-                    bOK = Relocalization();
-                }
+            if (mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2) {
+                bOK = TrackReferenceKeyFrame();                 // 根据参考帧进行跟踪
             } else {
-                // Localization Mode: Local Mapping is deactivated
-
-                if (mState == LOST) {
-                    bOK = Relocalization();
-                } else {
-                    if (!mbVO) {
-                        // In last frame we tracked enough MapPoints in the map
-
-                        if (!mVelocity.empty()) {
-                            bOK = TrackWithMotionModel();
-                        } else {
-                            bOK = TrackReferenceKeyFrame();
-                        }
-                    } else {
-                        // In last frame we tracked mainly "visual odometry" points.
-
-                        // We compute two camera poses, one from motion model and one doing relocalization.
-                        // If relocalization is sucessfull we choose that solution, otherwise we retain
-                        // the "visual odometry" solution.
-
-                        bool bOKMM = false;
-                        bool bOKReloc = false;
-                        vector<MapPoint *> vpMPsMM;
-                        vector<bool> vbOutMM;
-                        cv::Mat TcwMM;
-                        if (!mVelocity.empty()) {
-                            bOKMM = TrackWithMotionModel();
-                            vpMPsMM = mCurrentFrame.mvpMapPoints;
-                            vbOutMM = mCurrentFrame.mvbOutlier;
-                            TcwMM = mCurrentFrame.mTcw.clone();
-                        }
-                        bOKReloc = Relocalization();
-
-                        if (bOKMM && !bOKReloc) {
-                            mCurrentFrame.SetPose(TcwMM);
-                            mCurrentFrame.mvpMapPoints = vpMPsMM;
-                            mCurrentFrame.mvbOutlier = vbOutMM;
-
-                            if (mbVO) {
-                                for (int i = 0; i < mCurrentFrame.N; i++) {
-                                    if (mCurrentFrame.mvpMapPoints[i] && !mCurrentFrame.mvbOutlier[i]) {
-                                        mCurrentFrame.mvpMapPoints[i]->IncreaseFound();
-                                    }
-                                }
-                            }
-                        } else if (bOKReloc) {
-                            mbVO = false;
-                        }
-
-                        bOK = bOKReloc || bOKMM;
-                    }
-                }
+                bOK = TrackWithMotionModel();                   // 根据运动模型跟踪
+                if (!bOK)
+                    bOK = TrackReferenceKeyFrame();             // 运动模型跟踪失败,根据参考帧进行跟踪
             }
 
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
 
             // If we have an initial estimation of the camera pose and matching. Track the local map.
-            if (!mbOnlyTracking) {
-                if (bOK)
-                    bOK = TrackLocalMap();                // 跟踪局部地图,进一步优化当前帧位姿
-            } else {
-                // mbVO true means that there are few matches to MapPoints in the map. We cannot retrieve
-                // a local map and therefore we do not perform TrackLocalMap(). Once the system relocalizes
-                // the camera we will use the local map again.
-                if (bOK && !mbVO)
-                    bOK = TrackLocalMap();
-            }
+            if (bOK)
+                bOK = TrackLocalMap();                // 跟踪局部地图,进一步优化当前帧位姿
 
             if (bOK)
                 mState = OK;
@@ -331,7 +260,7 @@ namespace ORB_SLAM2 {
             mpFrameDrawer->Update(this);
 
             // If tracking were good, check if we insert a keyframe
-            if (bOK) {
+            if (mState == OK) {
                 // Update motion model
                 if (!mLastFrame.mTcw.empty()) {
                     cv::Mat LastTwc = cv::Mat::eye(4, 4, CV_32F);
@@ -769,8 +698,8 @@ namespace ORB_SLAM2 {
 
         KeyFrame *pKF = new KeyFrame(mCurrentFrame, mpMap, mpKeyFrameDB);
 
-        mpReferenceKF = pKF;
-        mCurrentFrame.mpReferenceKF = pKF;
+        mpReferenceKF = pKF;  // 修改当前Tracking线程的参考关键帧
+        mCurrentFrame.mpReferenceKF = pKF;  // 修改当前帧的参考关键帧
 
         if (mSensor != System::MONOCULAR) {
             mCurrentFrame.UpdatePoseMatrices();

@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
         // Pass the images to the SLAM system
         SLAM.TrackStereo(imLeft, imRight, tframe);
 
-        usleep(1000 * 1000 * 25);
+        usleep(1000 * 1000 * 5);
 
     }
 

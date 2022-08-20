@@ -29,22 +29,6 @@ namespace ORB_SLAM2 {
     System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer)
             : mSensor(sensor), mpViewer(static_cast<Viewer *>(NULL)), mbReset(false),
               mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false) {
-        // Output welcome message
-        cout << endl
-             << "ORB-SLAM2 Copyright (C) 2014-2016 Raul Mur-Artal, University of Zaragoza." << endl
-             << "This program comes with ABSOLUTELY NO WARRANTY;" << endl
-             << "This is free software, and you are welcome to redistribute it" << endl
-             << "under certain conditions. See LICENSE.txt." << endl
-             << endl;
-
-        cout << "Input sensor was set to: ";
-
-        if (mSensor == MONOCULAR)
-            cout << "Monocular" << endl;
-        else if (mSensor == STEREO)
-            cout << "Stereo" << endl;
-        else if (mSensor == RGBD)
-            cout << "RGB-D" << endl;
 
         // Check settings file
         cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
@@ -64,12 +48,6 @@ namespace ORB_SLAM2 {
 
         mpVocabulary = new ORBVocabulary();
         bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
-/*        if (!bVocLoad) {
-            cerr << "Wrong path to vocabulary. " << endl;
-            cerr << "Falied to open at: " << strVocFile << endl;
-            exit(-1);
-        }
-        cout << "Vocabulary loaded!" << endl << endl;*/
 
         // Create KeyFrame Database
         mpKeyFrameDatabase = new KeyFrameDatabase(*mpVocabulary);
