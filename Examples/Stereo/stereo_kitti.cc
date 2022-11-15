@@ -35,29 +35,23 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageLeft,
 
 int main(int argc, char **argv) {
 
-    argc = 4;
-    argv = new char *[4];
+//    argc = 4;
+//    argv = new char *[4];
 //    argv[0] = "";
-    argv[1] = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Vocabulary/ORBvoc.txt";
-    argv[2] = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/Stereo/KITTI00-02.yaml";
-    argv[3] = "/remote-home/2132917/kitti_datasets/dataset/sequences/00";
-
-    if (argc != 4) {
-        cerr << endl
-             << "Usage: ./stereo_kitti path_to_vocabulary path_to_settings path_to_sequence" << endl;
-        return 1;
-    }
+    string voc_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Vocabulary/ORBvoc.txt";
+    string config_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/Stereo/KITTI00-02.yaml";
+    string datasets_path = "/remote-home/2132917/kitti_datasets/dataset/sequences/00";
 
     // Retrieve paths to images
     vector<string> vstrImageLeft;
     vector<string> vstrImageRight;
     vector<double> vTimestamps;
-    LoadImages(string(argv[3]), vstrImageLeft, vstrImageRight, vTimestamps);
+    LoadImages(datasets_path, vstrImageLeft, vstrImageRight, vTimestamps);
 
     const int nImages = vstrImageLeft.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1], argv[2], ORB_SLAM2::System::STEREO, true);
+    ORB_SLAM2::System SLAM(voc_path, config_path, ORB_SLAM2::System::STEREO, true);
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -77,8 +71,7 @@ int main(int argc, char **argv) {
 
         // Pass the images to the SLAM system
         SLAM.TrackStereo(imLeft, imRight, tframe);
-
-        usleep(1000 * 1000 * 5);
+        SLAM.LocalMapping_run();
 
     }
 

@@ -40,11 +40,65 @@ namespace ORB_SLAM2 {
         mpTracker = pTracker;
     }
 
+    void LocalMapping::Run_once() {
+        //            cout << "[info] LocalMapping::Run() while (1) begin------------------" << endl;
+        // Tracking will see that Local Mapping is busy
+        SetAcceptKeyFrames(false);
+
+        // Check if there are keyframes in the queue
+        if (CheckNewKeyFrames() and count_LocalMapping_RunCheckNewKeyFrames == 0) {
+//            if (CheckNewKeyFrames()) {
+            cout << "[LocalMapping] CheckNewKeyFrames true---------------------------------------------"
+                 << count_LocalMapping_RunCheckNewKeyFrames++ << endl;
+
+            mpMap->test_critical_variables("LocalMapping1");
+
+            // BoW conversion and insertion in Map
+            ProcessNewKeyFrame();
+
+//                while (true) {}
+
+            // Check recent MapPoints
+            MapPointCulling();
+
+            // Triangulate new MapPoints
+            CreateNewMapPoints();
+
+            if (!CheckNewKeyFrames()) {
+                // Find more matches in neighbor keyframes and fuse point duplications
+                SearchInNeighbors();
+            }
+
+            mbAbortBA = false;
+
+            if (!CheckNewKeyFrames() && !stopRequested()) {
+                // Local BA
+                if (mpMap->KeyFramesInMap() > 2)
+                    Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
+
+                mpMap->test_critical_variables("LocalMapping2");
+                // Check redundant local Keyframes
+                KeyFrameCulling();
+            }
+
+//                mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
+
+            mpMap->test_critical_variables("LocalMapping3");
+
+        }
+
+        ResetIfRequested();
+
+        // Tracking will see that Local Mapping is busy
+        SetAcceptKeyFrames(true);
+
+    }
+
     void LocalMapping::Run() {
 
         mbFinished = false;
 
-        while (true) {}
+//        while (true) {}
 
         while (1) {
 //            cout << "[info] LocalMapping::Run() while (1) begin------------------" << endl;
@@ -142,7 +196,7 @@ namespace ORB_SLAM2 {
         // Compute Bags of Words structures
         mpCurrentKeyFrame->ComputeBoW();  // 关键代码，只有这行运行以后第二帧才能继续
 
-        while (true);
+//        while (true);
 
         // Associate MapPoints to the new keyframe and update normal and descriptor
         const vector<MapPoint *> vpMapPointMatches = mpCurrentKeyFrame->GetMapPointMatches();

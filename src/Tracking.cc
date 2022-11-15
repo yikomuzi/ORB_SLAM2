@@ -291,8 +291,8 @@ namespace ORB_SLAM2 {
                 mlpTemporalPoints.clear();
 
                 // 【关键】判断当前帧是否为关键帧    Check if we need to insert a new keyframe
-//                if (NeedNewKeyFrame())
-//                    CreateNewKeyFrame();
+                if (NeedNewKeyFrame())
+                    CreateNewKeyFrame();
 
                 // We allow points with high innovation (considererd outliers by the Huber Function)
                 // pass to the new keyframe, so that bundle adjustment will finally decide
@@ -383,7 +383,7 @@ namespace ORB_SLAM2 {
             cout << "count_mvuRight_available: " << count_mvuRight_available << endl;
             cout << "New map created with " << mpMap->MapPointsInMap() << " points" << endl;
 
-//            mpLocalMapper->InsertKeyFrame(pKFini);  // 局部建图线程启动
+            mpLocalMapper->InsertKeyFrame(pKFini);  // 局部建图线程启动, 第一帧一定是关键帧
 
 
             // 从这里开始当前帧mCurrentFrame已经处理结束，对下一帧进行准备，第一帧变为上一帧，设置参考关键帧
@@ -404,7 +404,7 @@ namespace ORB_SLAM2 {
 
             mState = OK;
 
-            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图
+//            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图
         }
     }
 

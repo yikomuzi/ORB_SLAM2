@@ -67,6 +67,7 @@ namespace ORB_SLAM2 {
         // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
         // Returns the camera pose (empty if tracking fails).
         cv::Mat TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp);
+        void LocalMapping_run();
 
         // Process the given rgbd frame. Depthmap must be registered to the RGB frame.
         // Input image: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
