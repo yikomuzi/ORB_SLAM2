@@ -26,6 +26,7 @@
 #include "Tracking.h"
 #include "System.h"
 
+#include <pangolin/pangolin.h>
 #include <mutex>
 
 namespace ORB_SLAM2
@@ -44,6 +45,7 @@ namespace ORB_SLAM2
         // Main thread function. Draw points, keyframes, the current camera pose and the last processed
         // frame. Drawing is refreshed according to the camera fps. We use Pangolin.
         void Run();
+        void Run_once();
 
         void RequestFinish();
 
@@ -78,6 +80,21 @@ namespace ORB_SLAM2
         bool mbStopped;
         bool mbStopRequested;
         std::mutex mMutexStop;
+
+
+//        pangolin::Var<bool> menuFollowCamera;
+//        pangolin::Var<bool> menuShowPoints;
+//        pangolin::Var<bool> menuShowKeyFrames;
+//        pangolin::Var<bool> menuShowGraph;
+//        pangolin::Var<bool> menuLocalizationMode;
+//        pangolin::Var<bool> menuReset;
+
+        pangolin::View d_cam;
+        pangolin::OpenGlRenderState s_cam;
+        pangolin::OpenGlMatrix Twc;
+
+        bool bFollow;
+        bool bLocalizationMode;
     };
 
 }

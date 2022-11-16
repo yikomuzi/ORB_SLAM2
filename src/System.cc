@@ -74,7 +74,7 @@ namespace ORB_SLAM2 {
         // 可视化线程    Initialize the Viewer thread and launch
         if (bUseViewer) {
             mpViewer = new Viewer(this, mpFrameDrawer, mpMapDrawer, mpTracker, strSettingsFile);
-            mptViewer = new thread(&Viewer::Run, mpViewer);
+//            mptViewer = new thread(&Viewer::Run, mpViewer);
             mpTracker->SetViewer(mpViewer);
         }
 
@@ -93,42 +93,45 @@ namespace ORB_SLAM2 {
         mpLocalMapper->Run_once();
     }
 
+    void System::Viewer_run() {
+        mpViewer->Run_once();
+    }
 
     cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp) {
 
-        // Check mode change
-        {
-            unique_lock<mutex> lock(mMutexMode);
-            if (mbActivateLocalizationMode) {
-                mpLocalMapper->RequestStop();
+//        // Check mode change
+//        {
+//            unique_lock<mutex> lock(mMutexMode);
+//            if (mbActivateLocalizationMode) {
+//                mpLocalMapper->RequestStop();
+//
+//                // Wait until Local Mapping has effectively stopped
+//                while (!mpLocalMapper->isStopped()) {
+//                    usleep(1000);
+//                }
+//
+//                mpTracker->InformOnlyTracking(true);
+//                mbActivateLocalizationMode = false;
+//            }
+//            if (mbDeactivateLocalizationMode) {
+//                mpTracker->InformOnlyTracking(false);
+//                mpLocalMapper->Release();
+//                mbDeactivateLocalizationMode = false;
+//            }
+//        }
 
-                // Wait until Local Mapping has effectively stopped
-                while (!mpLocalMapper->isStopped()) {
-                    usleep(1000);
-                }
-
-                mpTracker->InformOnlyTracking(true);
-                mbActivateLocalizationMode = false;
-            }
-            if (mbDeactivateLocalizationMode) {
-                mpTracker->InformOnlyTracking(false);
-                mpLocalMapper->Release();
-                mbDeactivateLocalizationMode = false;
-            }
-        }
-
-        // Check reset
-        {
-            unique_lock<mutex> lock(mMutexReset);
-            if (mbReset) {
-                mpTracker->Reset();
-                mbReset = false;
-            }
-        }
+//        // Check reset
+//        {
+//            unique_lock<mutex> lock(mMutexReset);
+//            if (mbReset) {
+//                mpTracker->Reset();
+//                mbReset = false;
+//            }
+//        }
 
         cv::Mat Tcw = mpTracker->GrabImageStereo(imLeft, imRight, timestamp);
 
-        unique_lock<mutex> lock2(mMutexState);
+//        unique_lock<mutex> lock2(mMutexState);
         mTrackingState = mpTracker->mState;
         mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
         mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
@@ -137,13 +140,13 @@ namespace ORB_SLAM2 {
 
 
     void System::ActivateLocalizationMode() {
-        unique_lock<mutex> lock(mMutexMode);
-        mbActivateLocalizationMode = true;
+//        unique_lock<mutex> lock(mMutexMode);
+//        mbActivateLocalizationMode = true;
     }
 
     void System::DeactivateLocalizationMode() {
-        unique_lock<mutex> lock(mMutexMode);
-        mbDeactivateLocalizationMode = true;
+//        unique_lock<mutex> lock(mMutexMode);
+//        mbDeactivateLocalizationMode = true;
     }
 
     bool System::MapChanged() {
@@ -157,8 +160,8 @@ namespace ORB_SLAM2 {
     }
 
     void System::Reset() {
-        unique_lock<mutex> lock(mMutexReset);
-        mbReset = true;
+//        unique_lock<mutex> lock(mMutexReset);
+//        mbReset = true;
     }
 
     void System::Shutdown() {
@@ -331,17 +334,17 @@ namespace ORB_SLAM2 {
     }
 
     int System::GetTrackingState() {
-        unique_lock<mutex> lock(mMutexState);
+//        unique_lock<mutex> lock(mMutexState);
         return mTrackingState;
     }
 
     vector<MapPoint *> System::GetTrackedMapPoints() {
-        unique_lock<mutex> lock(mMutexState);
+//        unique_lock<mutex> lock(mMutexState);
         return mTrackedMapPoints;
     }
 
     vector<cv::KeyPoint> System::GetTrackedKeyPointsUn() {
-        unique_lock<mutex> lock(mMutexState);
+//        unique_lock<mutex> lock(mMutexState);
         return mTrackedKeyPointsUn;
     }
 

@@ -221,7 +221,7 @@ namespace ORB_SLAM2 {
         mLastProcessedState = mState;
 
         // Get Map Mutex -> Map cannot be changed
-        unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
+//        unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
 
         if (mState == NOT_INITIALIZED) {
             StereoInitialization();                                                     // RGBD第一帧初始化

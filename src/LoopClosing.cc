@@ -400,7 +400,7 @@ namespace ORB_SLAM2 {
 
         {
             // Get Map Mutex
-            unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
+//            unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
 
             for (vector<KeyFrame *>::iterator vit = mvpCurrentConnectedKFs.begin(), vend = mvpCurrentConnectedKFs.end();
                  vit != vend; vit++) {
@@ -552,7 +552,7 @@ namespace ORB_SLAM2 {
             matcher.Fuse(pKF, cvScw, mvpLoopMapPoints, 4, vpReplacePoints);
 
             // Get Map Mutex
-            unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
+//            unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
             const int nLP = mvpLoopMapPoints.size();
             for (int i = 0; i < nLP; i++) {
                 MapPoint *pRep = vpReplacePoints[i];
@@ -615,7 +615,7 @@ namespace ORB_SLAM2 {
                 }
 
                 // Get Map Mutex
-                unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
+//                unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
 
                 // Correct keyframes starting at map first keyframe
                 list<KeyFrame *> lpKFtoCheck(mpMap->mvpKeyFrameOrigins.begin(), mpMap->mvpKeyFrameOrigins.end());

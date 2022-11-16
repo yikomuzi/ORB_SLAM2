@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
         // Pass the images to the SLAM system
         SLAM.TrackStereo(imLeft, imRight, tframe);
         SLAM.LocalMapping_run();
-
+        SLAM.Viewer_run();
     }
 
     // Stop all threads

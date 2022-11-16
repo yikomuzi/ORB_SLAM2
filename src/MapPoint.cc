@@ -46,7 +46,7 @@ namespace ORB_SLAM2 {
         mNormalVector = cv::Mat::zeros(3, 1, CV_32F);
 
         // MapPoints can be created from Tracking and Local Mapping. This mutex avoid conflicts with id.
-        unique_lock<mutex> lock(mpMap->mMutexPointCreation);
+//        unique_lock<mutex> lock(mpMap->mMutexPointCreation);
         mnId = nNextId++;
     }
 
@@ -72,7 +72,7 @@ namespace ORB_SLAM2 {
         pFrame->mDescriptors.row(idxF).copyTo(mDescriptor);
 
         // MapPoints can be created from Tracking and Local Mapping. This mutex avoid conflicts with id.
-        unique_lock<mutex> lock(mpMap->mMutexPointCreation);
+//        unique_lock<mutex> lock(mpMap->mMutexPointCreation);
         mnId = nNextId++;
     }
 

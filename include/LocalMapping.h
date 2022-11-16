@@ -77,7 +77,7 @@ namespace ORB_SLAM2 {
         bool isFinished();
 
         int KeyframesInQueue() {
-            unique_lock<std::mutex> lock(mMutexNewKFs);
+//            unique_lock<std::mutex> lock(mMutexNewKFs);
             return mlNewKeyFrames.size();
         }
 
@@ -124,7 +124,7 @@ namespace ORB_SLAM2 {
 
         std::list<MapPoint *> mlpRecentAddedMapPoints;
 
-        std::mutex mMutexNewKFs;
+//        std::mutex mMutexNewKFs;
 
         bool mbAbortBA;
 

@@ -55,7 +55,7 @@ namespace ORB_SLAM2
 
         cv::Mat mCameraPose;
 
-        std::mutex mMutexCamera;
+//        std::mutex mMutexCamera;
     };
 
 } // namespace ORB_SLAM

@@ -68,6 +68,7 @@ namespace ORB_SLAM2 {
         // Returns the camera pose (empty if tracking fails).
         cv::Mat TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp);
         void LocalMapping_run();
+        void Viewer_run();
 
         // Process the given rgbd frame. Depthmap must be registered to the RGB frame.
         // Input image: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
@@ -166,11 +167,11 @@ namespace ORB_SLAM2 {
         std::thread *mptViewer;
 
         // Reset flag
-        std::mutex mMutexReset;
+//        std::mutex mMutexReset;
         bool mbReset;
 
         // Change mode flags
-        std::mutex mMutexMode;
+//        std::mutex mMutexMode;
         bool mbActivateLocalizationMode;
         bool mbDeactivateLocalizationMode;
 
@@ -178,7 +179,7 @@ namespace ORB_SLAM2 {
         int mTrackingState;
         std::vector<MapPoint *> mTrackedMapPoints;
         std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
-        std::mutex mMutexState;
+//        std::mutex mMutexState;
 
 
         int count_System_TrackRGBD = 0;

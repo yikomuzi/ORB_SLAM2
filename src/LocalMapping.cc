@@ -46,7 +46,7 @@ namespace ORB_SLAM2 {
         SetAcceptKeyFrames(false);
 
         // Check if there are keyframes in the queue
-        if (CheckNewKeyFrames() and count_LocalMapping_RunCheckNewKeyFrames == 0) {
+        if (CheckNewKeyFrames()) {
 //            if (CheckNewKeyFrames()) {
             cout << "[LocalMapping] CheckNewKeyFrames true---------------------------------------------"
                  << count_LocalMapping_RunCheckNewKeyFrames++ << endl;
@@ -172,21 +172,21 @@ namespace ORB_SLAM2 {
     }
 
     void LocalMapping::InsertKeyFrame(KeyFrame *pKF) {
-        unique_lock<mutex> lock(mMutexNewKFs);
+//        unique_lock<mutex> lock(mMutexNewKFs);
         mlNewKeyFrames.push_back(pKF);
         mbAbortBA = true;
     }
 
 
     bool LocalMapping::CheckNewKeyFrames() {
-        unique_lock<mutex> lock(mMutexNewKFs);
+//        unique_lock<mutex> lock(mMutexNewKFs);
         return (!mlNewKeyFrames.empty());
     }
 
     void LocalMapping::ProcessNewKeyFrame() {
         cout << "[LocalMapping] ProcessNewKeyFrame()--------" << endl;
         {
-            unique_lock<mutex> lock(mMutexNewKFs);
+//            unique_lock<mutex> lock(mMutexNewKFs);
             mpCurrentKeyFrame = mlNewKeyFrames.front();
             mlNewKeyFrames.pop_front();
         }
@@ -588,7 +588,7 @@ namespace ORB_SLAM2 {
     void LocalMapping::RequestStop() {
         unique_lock<mutex> lock(mMutexStop);
         mbStopRequested = true;
-        unique_lock<mutex> lock2(mMutexNewKFs);
+//        unique_lock<mutex> lock2(mMutexNewKFs);
         mbAbortBA = true;
     }
 

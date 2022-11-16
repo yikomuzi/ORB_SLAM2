@@ -206,7 +206,7 @@ namespace ORB_SLAM2 {
 
 
     void MapDrawer::SetCurrentCameraPose(const cv::Mat &Tcw) {
-        unique_lock<mutex> lock(mMutexCamera);
+//        unique_lock<mutex> lock(mMutexCamera);
         mCameraPose = Tcw.clone();
     }
 
@@ -215,7 +215,7 @@ namespace ORB_SLAM2 {
             cv::Mat Rwc(3, 3, CV_32F);
             cv::Mat twc(3, 1, CV_32F);
             {
-                unique_lock<mutex> lock(mMutexCamera);
+//                unique_lock<mutex> lock(mMutexCamera);
                 Rwc = mCameraPose.rowRange(0, 3).colRange(0, 3).t();
                 twc = -Rwc * mCameraPose.rowRange(0, 3).col(3);
             }

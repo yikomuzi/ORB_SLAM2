@@ -71,10 +71,10 @@ namespace ORB_SLAM2 {
 
         vector<KeyFrame *> mvpKeyFrameOrigins;
 
-        std::mutex mMutexMapUpdate;
+//        std::mutex mMutexMapUpdate;
 
         // This avoid that two points are created simultaneously in separate threads (id conflict)
-        std::mutex mMutexPointCreation;
+//        std::mutex mMutexPointCreation;
 
     protected:
         std::set<MapPoint *> mspMapPoints;
@@ -87,7 +87,7 @@ namespace ORB_SLAM2 {
         // Index related to a big change in the map (loop closure, global BA)
         int mnBigChangeIdx;
 
-        std::mutex mMutexMap;
+//        std::mutex mMutexMap;
     };
 
 } // namespace ORB_SLAM
