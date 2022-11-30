@@ -33,8 +33,8 @@
 
 #include "KeyFrameDatabase.h"
 
-#include <thread>
-#include <mutex>
+//#include <thread>
+//#include <mutex>
 #include "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
 
 namespace ORB_SLAM2 {
@@ -70,12 +70,12 @@ namespace ORB_SLAM2 {
         void RunGlobalBundleAdjustment(unsigned long nLoopKF);
 
         bool isRunningGBA() {
-            unique_lock<std::mutex> lock(mMutexGBA);
+//            unique_lock<std::mutex> lock(mMutexGBA);
             return mbRunningGBA;
         }
 
         bool isFinishedGBA() {
-            unique_lock<std::mutex> lock(mMutexGBA);
+//            unique_lock<std::mutex> lock(mMutexGBA);
             return mbFinishedGBA;
         }
 
@@ -99,7 +99,7 @@ namespace ORB_SLAM2 {
         void ResetIfRequested();
 
         bool mbResetRequested;
-        std::mutex mMutexReset;
+//        std::mutex mMutexReset;
 
         bool CheckFinish();
 
@@ -107,7 +107,7 @@ namespace ORB_SLAM2 {
 
         bool mbFinishRequested;
         bool mbFinished;
-        std::mutex mMutexFinish;
+//        std::mutex mMutexFinish;
 
         Map *mpMap;
         Tracking *mpTracker;
@@ -119,7 +119,7 @@ namespace ORB_SLAM2 {
 
         std::list<KeyFrame *> mlpLoopKeyFrameQueue;
 
-        std::mutex mMutexLoopQueue;
+//        std::mutex mMutexLoopQueue;
 
         // Loop detector parameters
         float mnCovisibilityConsistencyTh;
@@ -141,8 +141,8 @@ namespace ORB_SLAM2 {
         bool mbRunningGBA;
         bool mbFinishedGBA;
         bool mbStopGBA;
-        std::mutex mMutexGBA;
-        std::thread *mpThreadGBA;
+//        std::mutex mMutexGBA;
+//        std::thread *mpThreadGBA;
 
         // Fix scale in the stereo/RGB-D case
         bool mbFixScale;

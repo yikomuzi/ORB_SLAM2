@@ -22,7 +22,7 @@
 #define SYSTEM_H
 
 #include <string>
-#include <thread>
+//#include <thread>
 #include <opencv2/core/core.hpp>
 
 #include "Tracking.h"
@@ -162,9 +162,9 @@ namespace ORB_SLAM2 {
 
         // System threads: Local Mapping, Loop Closing, Viewer.
         // The Tracking thread "lives" in the main execution thread that creates the System object.
-        std::thread *mptLocalMapping;
-        std::thread *mptLoopClosing;
-        std::thread *mptViewer;
+//        std::thread *mptLocalMapping;
+//        std::thread *mptLoopClosing;
+//        std::thread *mptViewer;
 
         // Reset flag
 //        std::mutex mMutexReset;

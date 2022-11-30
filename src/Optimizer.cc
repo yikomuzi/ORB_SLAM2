@@ -32,7 +32,7 @@
 
 #include "Converter.h"
 
-#include<mutex>
+//#include<mutex>
 
 namespace ORB_SLAM2 {
 
@@ -255,7 +255,7 @@ namespace ORB_SLAM2 {
 
 
         {
-            unique_lock<mutex> lock(MapPoint::mGlobalMutex);
+//            unique_lock<mutex> lock(MapPoint::mGlobalMutex);
 
             for (int i = 0; i < N; i++) {
                 MapPoint *pMP = pFrame->mvpMapPoints[i];

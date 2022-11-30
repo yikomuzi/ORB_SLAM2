@@ -37,7 +37,7 @@
 #include "MapDrawer.h"
 #include "System.h"
 
-#include <mutex>
+//#include <mutex>
 
 namespace ORB_SLAM2 {
 
@@ -214,7 +214,7 @@ namespace ORB_SLAM2 {
 
         // Last Frame, KeyFrame and Relocalisation Info
         KeyFrame *mpLastKeyFrame;
-        Frame mLastFrame;
+        Frame mLastFrame;  // 保存上一个mCurrentFrame
         unsigned int mnLastKeyFrameId;
         unsigned int mnLastRelocFrameId;
 

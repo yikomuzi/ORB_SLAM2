@@ -60,7 +60,7 @@ Viewer.PointSize: 2
 Viewer.CameraSize: 0.7
 Viewer.CameraLineWidth: 3
 Viewer.ViewpointX: 0
-Viewer.ViewpointY: -500  # 相机在上面多少米
+Viewer.ViewpointY: -100  # 相机在上面多少米
 Viewer.ViewpointZ: 0
 Viewer.ViewpointF: 250
 

@@ -25,7 +25,7 @@
 #include "Optimizer.h"
 #include "ORBmatcher.h"
 
-#include <thread>
+//#include <thread>
 
 namespace ORB_SLAM2
 {
@@ -101,12 +101,12 @@ namespace ORB_SLAM2
         float SH, SF;
         cv::Mat H, F;
 
-        thread threadH(&Initializer::FindHomography, this, ref(vbMatchesInliersH), ref(SH), ref(H));
-        thread threadF(&Initializer::FindFundamental, this, ref(vbMatchesInliersF), ref(SF), ref(F));
+//        thread threadH(&Initializer::FindHomography, this, ref(vbMatchesInliersH), ref(SH), ref(H));
+//        thread threadF(&Initializer::FindFundamental, this, ref(vbMatchesInliersF), ref(SF), ref(F));
 
         // Wait until both threads have finished
-        threadH.join();
-        threadF.join();
+//        threadH.join();
+//        threadF.join();
 
         // Compute ratio of scores
         float RH = SH / (SH + SF);

@@ -29,7 +29,7 @@
 #include "Frame.h"
 #include "KeyFrameDatabase.h"
 
-#include <mutex>
+//#include <mutex>
 
 
 namespace ORB_SLAM2 {
@@ -259,9 +259,9 @@ namespace ORB_SLAM2 {
 
         Map *mpMap;
 
-        std::mutex mMutexPose;
-        std::mutex mMutexConnections;
-        std::mutex mMutexFeatures;
+//        std::mutex mMutexPose;
+//        std::mutex mMutexConnections;
+//        std::mutex mMutexFeatures;
     };
 
 } //namespace ORB_SLAM

@@ -28,8 +28,8 @@
 
 #include "ORBmatcher.h"
 
-#include<mutex>
-#include<thread>
+//#include<mutex>
+//#include<thread>
 
 
 namespace ORB_SLAM2 {
@@ -38,7 +38,9 @@ namespace ORB_SLAM2 {
             mbResetRequested(false), mbFinishRequested(false), mbFinished(true), mpMap(pMap),
             mpKeyFrameDB(pDB), mpORBVocabulary(pVoc), mpMatchedKF(NULL), mLastLoopKFid(0), mbRunningGBA(false),
             mbFinishedGBA(true),
-            mbStopGBA(false), mpThreadGBA(NULL), mbFixScale(bFixScale), mnFullBAIdx(0) {
+            mbStopGBA(false),
+//            mpThreadGBA(NULL),
+            mbFixScale(bFixScale), mnFullBAIdx(0) {
         mnCovisibilityConsistencyTh = 3;
     }
 
@@ -85,19 +87,19 @@ namespace ORB_SLAM2 {
     }
 
     void LoopClosing::InsertKeyFrame(KeyFrame *pKF) {
-        unique_lock<mutex> lock(mMutexLoopQueue);
+//        unique_lock<mutex> lock(mMutexLoopQueue);
         if (pKF->mnId != 0)
             mlpLoopKeyFrameQueue.push_back(pKF);
     }
 
     bool LoopClosing::CheckNewKeyFrames() {
-        unique_lock<mutex> lock(mMutexLoopQueue);
+//        unique_lock<mutex> lock(mMutexLoopQueue);
         return (!mlpLoopKeyFrameQueue.empty());
     }
 
     bool LoopClosing::DetectLoop() {
         {
-            unique_lock<mutex> lock(mMutexLoopQueue);
+//            unique_lock<mutex> lock(mMutexLoopQueue);
             mpCurrentKF = mlpLoopKeyFrameQueue.front();
             mlpLoopKeyFrameQueue.pop_front();
             // Avoid that a keyframe can be erased while it is being process by this thread
@@ -370,15 +372,15 @@ namespace ORB_SLAM2 {
 
         // If a Global Bundle Adjustment is running, abort it
         if (isRunningGBA()) {
-            unique_lock<mutex> lock(mMutexGBA);
+//            unique_lock<mutex> lock(mMutexGBA);
             mbStopGBA = true;
 
             mnFullBAIdx++;
 
-            if (mpThreadGBA) {
-                mpThreadGBA->detach();
-                delete mpThreadGBA;
-            }
+//            if (mpThreadGBA) {
+//                mpThreadGBA->detach();
+//                delete mpThreadGBA;
+//            }
         }
 
         // Wait until Local Mapping has effectively stopped
@@ -530,7 +532,7 @@ namespace ORB_SLAM2 {
         mbRunningGBA = true;
         mbFinishedGBA = false;
         mbStopGBA = false;
-        mpThreadGBA = new thread(&LoopClosing::RunGlobalBundleAdjustment, this, mpCurrentKF->mnId);
+//        mpThreadGBA = new thread(&LoopClosing::RunGlobalBundleAdjustment, this, mpCurrentKF->mnId);
 
         // Loop closed. Release Local Mapping.
         mpLocalMapper->Release();
@@ -566,13 +568,13 @@ namespace ORB_SLAM2 {
 
     void LoopClosing::RequestReset() {
         {
-            unique_lock<mutex> lock(mMutexReset);
+//            unique_lock<mutex> lock(mMutexReset);
             mbResetRequested = true;
         }
 
         while (1) {
             {
-                unique_lock<mutex> lock2(mMutexReset);
+//                unique_lock<mutex> lock2(mMutexReset);
                 if (!mbResetRequested)
                     break;
             }
@@ -581,7 +583,7 @@ namespace ORB_SLAM2 {
     }
 
     void LoopClosing::ResetIfRequested() {
-        unique_lock<mutex> lock(mMutexReset);
+//        unique_lock<mutex> lock(mMutexReset);
         if (mbResetRequested) {
             mlpLoopKeyFrameQueue.clear();
             mLastLoopKFid = 0;
@@ -600,7 +602,7 @@ namespace ORB_SLAM2 {
         // not included in the Global BA and they are not consistent with the updated map.
         // We need to propagate the correction through the spanning tree
         {
-            unique_lock<mutex> lock(mMutexGBA);
+//            unique_lock<mutex> lock(mMutexGBA);
             if (idx != mnFullBAIdx)
                 return;
 
@@ -686,22 +688,22 @@ namespace ORB_SLAM2 {
     }
 
     void LoopClosing::RequestFinish() {
-        unique_lock<mutex> lock(mMutexFinish);
+//        unique_lock<mutex> lock(mMutexFinish);
         mbFinishRequested = true;
     }
 
     bool LoopClosing::CheckFinish() {
-        unique_lock<mutex> lock(mMutexFinish);
+//        unique_lock<mutex> lock(mMutexFinish);
         return mbFinishRequested;
     }
 
     void LoopClosing::SetFinish() {
-        unique_lock<mutex> lock(mMutexFinish);
+//        unique_lock<mutex> lock(mMutexFinish);
         mbFinished = true;
     }
 
     bool LoopClosing::isFinished() {
-        unique_lock<mutex> lock(mMutexFinish);
+//        unique_lock<mutex> lock(mMutexFinish);
         return mbFinished;
     }
 

@@ -24,7 +24,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include<mutex>
+//#include<mutex>
 
 namespace ORB_SLAM2 {
 
@@ -43,7 +43,7 @@ namespace ORB_SLAM2 {
 
         //Copy variables within scoped mutex
         {
-            unique_lock<mutex> lock(mMutex);
+//            unique_lock<mutex> lock(mMutex);
             state = mState;
             if (mState == Tracking::SYSTEM_NOT_READY)
                 mState = Tracking::NO_IMAGES_YET;
@@ -145,7 +145,7 @@ namespace ORB_SLAM2 {
     }
 
     void FrameDrawer::Update(Tracking *pTracker) {
-        unique_lock<mutex> lock(mMutex);
+//        unique_lock<mutex> lock(mMutex);
         pTracker->mImGray.copyTo(mIm);
         mvCurrentKeys = pTracker->mCurrentFrame.mvKeys;
         N = mvCurrentKeys.size();

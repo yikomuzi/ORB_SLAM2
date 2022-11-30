@@ -21,7 +21,7 @@
 #include "Viewer.h"
 #include <pangolin/pangolin.h>
 
-#include <mutex>
+//#include <mutex>
 
 namespace ORB_SLAM2 {
 
@@ -162,12 +162,12 @@ namespace ORB_SLAM2 {
     }
 
     void Viewer::RequestFinish() {
-        unique_lock<mutex> lock(mMutexFinish);
+//        unique_lock<mutex> lock(mMutexFinish);
         mbFinishRequested = true;
     }
 
     bool Viewer::CheckFinish() {
-        unique_lock<mutex> lock(mMutexFinish);
+//        unique_lock<mutex> lock(mMutexFinish);
         return mbFinishRequested;
     }
 

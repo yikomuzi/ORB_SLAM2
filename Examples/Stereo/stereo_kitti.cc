@@ -35,12 +35,9 @@ void LoadImages(const string &strPathToSequence, vector<string> &vstrImageLeft,
 
 int main(int argc, char **argv) {
 
-//    argc = 4;
-//    argv = new char *[4];
-//    argv[0] = "";
     string voc_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Vocabulary/ORBvoc.txt";
-    string config_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/Stereo/KITTI00-02.yaml";
-    string datasets_path = "/remote-home/2132917/kitti_datasets/dataset/sequences/00";
+    string config_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/Stereo/KITTI04-12.yaml";
+    string datasets_path = "/remote-home/2132917/kitti_datasets/dataset/sequences/07";
 
     // Retrieve paths to images
     vector<string> vstrImageLeft;
@@ -53,16 +50,14 @@ int main(int argc, char **argv) {
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(voc_path, config_path, ORB_SLAM2::System::STEREO, true);
 
-    // Vector for tracking time statistics
-    vector<float> vTimesTrack;
-    vTimesTrack.resize(nImages);
+//    // Vector for tracking time statistics
+//    vector<float> vTimesTrack;
+//    vTimesTrack.resize(nImages);
 
     // Main loop
     cv::Mat imLeft, imRight;
     for (int ni = 0; ni < nImages; ni++) {
-
-        cout << "[main] main loop------------------------------------------------------------------------------------"
-             << ni << "/" << nImages << endl;
+        cout << "[main] main loop-------------------------------------------" << ni << "/" << nImages << endl;
 
         // Read left and right images from file
         imLeft = cv::imread(vstrImageLeft[ni], CV_LOAD_IMAGE_UNCHANGED);
@@ -71,26 +66,26 @@ int main(int argc, char **argv) {
 
         // Pass the images to the SLAM system
         SLAM.TrackStereo(imLeft, imRight, tframe);
-        SLAM.LocalMapping_run();
+//        SLAM.LocalMapping_run();
         SLAM.Viewer_run();
     }
 
-    // Stop all threads
-    SLAM.Shutdown();
-
-    // Tracking time statistics
-    sort(vTimesTrack.begin(), vTimesTrack.end());
-    float totaltime = 0;
-    for (int ni = 0; ni < nImages; ni++) {
-        totaltime += vTimesTrack[ni];
-    }
-    cout << "-------" << endl
-         << endl;
-    cout << "median tracking time: " << vTimesTrack[nImages / 2] << endl;
-    cout << "mean tracking time: " << totaltime / nImages << endl;
-
-    // Save camera trajectory
-    SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
+//    // Stop all threads
+//    SLAM.Shutdown();
+//
+//    // Tracking time statistics
+//    sort(vTimesTrack.begin(), vTimesTrack.end());
+//    float totaltime = 0;
+//    for (int ni = 0; ni < nImages; ni++) {
+//        totaltime += vTimesTrack[ni];
+//    }
+//    cout << "-------" << endl
+//         << endl;
+//    cout << "median tracking time: " << vTimesTrack[nImages / 2] << endl;
+//    cout << "mean tracking time: " << totaltime / nImages << endl;
+//
+//    // Save camera trajectory
+//    SLAM.SaveTrajectoryKITTI("CameraTrajectory.txt");
 
     return 0;
 }

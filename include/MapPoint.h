@@ -26,7 +26,7 @@
 #include "Map.h"
 
 #include <opencv2/core/core.hpp>
-#include <mutex>
+//#include <mutex>
 
 namespace ORB_SLAM2 {
 
@@ -122,7 +122,7 @@ namespace ORB_SLAM2 {
         cv::Mat mPosGBA;
         long unsigned int mnBAGlobalForKF;
 
-        static std::mutex mGlobalMutex;
+//        static std::mutex mGlobalMutex;
 
     protected:
         // Position in absolute coordinates
@@ -154,8 +154,8 @@ namespace ORB_SLAM2 {
 
         Map *mpMap;
 
-        std::mutex mMutexPos;
-        std::mutex mMutexFeatures;
+//        std::mutex mMutexPos;
+//        std::mutex mMutexFeatures;
     };
 
 } // namespace ORB_SLAM

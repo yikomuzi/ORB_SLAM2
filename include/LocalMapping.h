@@ -27,7 +27,7 @@
 #include "Tracking.h"
 #include "KeyFrameDatabase.h"
 
-#include <mutex>
+//#include <mutex>
 
 namespace ORB_SLAM2 {
 
@@ -103,7 +103,7 @@ namespace ORB_SLAM2 {
         void ResetIfRequested();
 
         bool mbResetRequested;
-        std::mutex mMutexReset;
+//        std::mutex mMutexReset;
 
         bool CheckFinish();
 
@@ -111,7 +111,7 @@ namespace ORB_SLAM2 {
 
         bool mbFinishRequested;
         bool mbFinished;
-        std::mutex mMutexFinish;
+//        std::mutex mMutexFinish;
 
         Map *mpMap;
 
@@ -131,10 +131,10 @@ namespace ORB_SLAM2 {
         bool mbStopped;
         bool mbStopRequested;
         bool mbNotStop;
-        std::mutex mMutexStop;
+//        std::mutex mMutexStop;
 
         bool mbAcceptKeyFrames;
-        std::mutex mMutexAccept;
+//        std::mutex mMutexAccept;
 
         int count_LocalMapping_RunCheckNewKeyFrames = 0;
     };

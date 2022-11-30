@@ -20,7 +20,7 @@
 
 #include "System.h"
 #include "Converter.h"
-#include <thread>
+//#include <thread>
 #include <pangolin/pangolin.h>
 #include <iomanip>
 
@@ -32,10 +32,10 @@ namespace ORB_SLAM2 {
 
         // Check settings file
         cv::FileStorage fsSettings(strSettingsFile.c_str(), cv::FileStorage::READ);
-        if (!fsSettings.isOpened()) {
-            cerr << "Failed to open settings file at: " << strSettingsFile << endl;
-            exit(-1);
-        }
+//        if (!fsSettings.isOpened()) {
+//            cerr << "Failed to open settings file at: " << strSettingsFile << endl;
+//            exit(-1);
+//        }
 
         // Load ORB Vocabulary
         cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
@@ -132,9 +132,9 @@ namespace ORB_SLAM2 {
         cv::Mat Tcw = mpTracker->GrabImageStereo(imLeft, imRight, timestamp);
 
 //        unique_lock<mutex> lock2(mMutexState);
-        mTrackingState = mpTracker->mState;
-        mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
-        mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
+//        mTrackingState = mpTracker->mState;
+//        mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
+//        mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
         return Tcw;
     }
 

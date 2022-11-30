@@ -21,12 +21,12 @@
 #include "MapPoint.h"
 #include "ORBmatcher.h"
 
-#include<mutex>
+//#include<mutex>
 
 namespace ORB_SLAM2 {
 
     long unsigned int MapPoint::nNextId = 0;
-    mutex MapPoint::mGlobalMutex;
+//    mutex MapPoint::mGlobalMutex;
 
     MapPoint::MapPoint(const cv::Mat &Pos, KeyFrame *pRefKF, Map *pMap) : mnFirstKFid(pRefKF->mnId),
                                                                           mnFirstFrame(pRefKF->mnFrameId),
@@ -77,33 +77,33 @@ namespace ORB_SLAM2 {
     }
 
     void MapPoint::SetWorldPos(const cv::Mat &Pos) {
-        unique_lock<mutex> lock2(mGlobalMutex);
-        unique_lock<mutex> lock(mMutexPos);
+//        unique_lock<mutex> lock2(mGlobalMutex);
+//        unique_lock<mutex> lock(mMutexPos);
         Pos.copyTo(mWorldPos);
     }
 
     cv::Mat MapPoint::GetWorldPos() {
-        unique_lock<mutex> lock(mMutexPos);
+//        unique_lock<mutex> lock(mMutexPos);
         return mWorldPos.clone();
     }
 
     cv::Mat MapPoint::GetNormal() {
-        unique_lock<mutex> lock(mMutexPos);
+//        unique_lock<mutex> lock(mMutexPos);
         return mNormalVector.clone();
     }
 
     KeyFrame *MapPoint::GetReferenceKeyFrame() {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         return mpRefKF;
     }
 
     void MapPoint::AddObservation(KeyFrame *pKF, size_t idx) {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         if (mObservations.count(pKF))
             return;
         mObservations[pKF] = idx;
 
-        if (pKF->mvuRight[idx] >= 0)
+        if (pKF->mvuRight[idx] >= 0)  // 判断右目是否观测到该地图点
             nObs += 2;
         else
             nObs++;
@@ -112,7 +112,7 @@ namespace ORB_SLAM2 {
     void MapPoint::EraseObservation(KeyFrame *pKF) {
         bool bBad = false;
         {
-            unique_lock<mutex> lock(mMutexFeatures);
+//            unique_lock<mutex> lock(mMutexFeatures);
             if (mObservations.count(pKF)) {
                 int idx = mObservations[pKF];
                 if (pKF->mvuRight[idx] >= 0)
@@ -136,20 +136,20 @@ namespace ORB_SLAM2 {
     }
 
     map<KeyFrame *, size_t> MapPoint::GetObservations() {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         return mObservations;
     }
 
     int MapPoint::Observations() {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         return nObs;
     }
 
     void MapPoint::SetBadFlag() {
         map<KeyFrame *, size_t> obs;
         {
-            unique_lock<mutex> lock1(mMutexFeatures);
-            unique_lock<mutex> lock2(mMutexPos);
+//            unique_lock<mutex> lock1(mMutexFeatures);
+//            unique_lock<mutex> lock2(mMutexPos);
             mbBad = true;
             obs = mObservations;
             mObservations.clear();
@@ -163,8 +163,8 @@ namespace ORB_SLAM2 {
     }
 
     MapPoint *MapPoint::GetReplaced() {
-        unique_lock<mutex> lock1(mMutexFeatures);
-        unique_lock<mutex> lock2(mMutexPos);
+//        unique_lock<mutex> lock1(mMutexFeatures);
+//        unique_lock<mutex> lock2(mMutexPos);
         return mpReplaced;
     }
 
@@ -175,8 +175,8 @@ namespace ORB_SLAM2 {
         int nvisible, nfound;
         map<KeyFrame *, size_t> obs;
         {
-            unique_lock<mutex> lock1(mMutexFeatures);
-            unique_lock<mutex> lock2(mMutexPos);
+//            unique_lock<mutex> lock1(mMutexFeatures);
+//            unique_lock<mutex> lock2(mMutexPos);
             obs = mObservations;
             mObservations.clear();
             mbBad = true;
@@ -204,23 +204,23 @@ namespace ORB_SLAM2 {
     }
 
     bool MapPoint::isBad() {
-        unique_lock<mutex> lock(mMutexFeatures);
-        unique_lock<mutex> lock2(mMutexPos);
+//        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock2(mMutexPos);
         return mbBad;
     }
 
     void MapPoint::IncreaseVisible(int n) {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         mnVisible += n;
     }
 
     void MapPoint::IncreaseFound(int n) {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         mnFound += n;
     }
 
     float MapPoint::GetFoundRatio() {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         return static_cast<float>(mnFound) / mnVisible;
     }
 
@@ -231,7 +231,7 @@ namespace ORB_SLAM2 {
         map<KeyFrame *, size_t> observations;
 
         {
-            unique_lock<mutex> lock1(mMutexFeatures);
+//            unique_lock<mutex> lock1(mMutexFeatures);
             if (mbBad)
                 return;
             observations = mObservations;
@@ -281,18 +281,18 @@ namespace ORB_SLAM2 {
         }
 
         {
-            unique_lock<mutex> lock(mMutexFeatures);
+//            unique_lock<mutex> lock(mMutexFeatures);
             mDescriptor = vDescriptors[BestIdx].clone();
         }
     }
 
     cv::Mat MapPoint::GetDescriptor() {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         return mDescriptor.clone();
     }
 
     int MapPoint::GetIndexInKeyFrame(KeyFrame *pKF) {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         if (mObservations.count(pKF))
             return mObservations[pKF];
         else
@@ -300,7 +300,7 @@ namespace ORB_SLAM2 {
     }
 
     bool MapPoint::IsInKeyFrame(KeyFrame *pKF) {
-        unique_lock<mutex> lock(mMutexFeatures);
+//        unique_lock<mutex> lock(mMutexFeatures);
         return (mObservations.count(pKF));
     }
 
@@ -309,8 +309,8 @@ namespace ORB_SLAM2 {
         KeyFrame *pRefKF;
         cv::Mat Pos;
         {
-            unique_lock<mutex> lock1(mMutexFeatures);
-            unique_lock<mutex> lock2(mMutexPos);
+//            unique_lock<mutex> lock1(mMutexFeatures);
+//            unique_lock<mutex> lock2(mMutexPos);
             if (mbBad)
                 return;
             observations = mObservations;
@@ -339,7 +339,7 @@ namespace ORB_SLAM2 {
         const int nLevels = pRefKF->mnScaleLevels;
 
         {
-            unique_lock<mutex> lock3(mMutexPos);
+//            unique_lock<mutex> lock3(mMutexPos);
             mfMaxDistance = dist * levelScaleFactor;
             mfMinDistance = mfMaxDistance / pRefKF->mvScaleFactors[nLevels - 1];
             mNormalVector = normal / n;
@@ -347,19 +347,19 @@ namespace ORB_SLAM2 {
     }
 
     float MapPoint::GetMinDistanceInvariance() {
-        unique_lock<mutex> lock(mMutexPos);
+//        unique_lock<mutex> lock(mMutexPos);
         return 0.8f * mfMinDistance;
     }
 
     float MapPoint::GetMaxDistanceInvariance() {
-        unique_lock<mutex> lock(mMutexPos);
+//        unique_lock<mutex> lock(mMutexPos);
         return 1.2f * mfMaxDistance;
     }
 
     int MapPoint::PredictScale(const float &currentDist, KeyFrame *pKF) {
         float ratio;
         {
-            unique_lock<mutex> lock(mMutexPos);
+//            unique_lock<mutex> lock(mMutexPos);
             ratio = mfMaxDistance / currentDist;
         }
 
@@ -375,7 +375,7 @@ namespace ORB_SLAM2 {
     int MapPoint::PredictScale(const float &currentDist, Frame *pF) {
         float ratio;
         {
-            unique_lock<mutex> lock(mMutexPos);
+//            unique_lock<mutex> lock(mMutexPos);
             ratio = mfMaxDistance / currentDist;
         }
 

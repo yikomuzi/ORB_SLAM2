@@ -34,7 +34,7 @@
 
 #include <iostream>
 
-#include <mutex>
+//#include <mutex>
 
 using namespace std;
 
@@ -175,27 +175,26 @@ namespace ORB_SLAM2 {
         mImGray = imRectLeft;
         cv::Mat imGrayRight = imRectRight;
 
-        if (mImGray.channels() == 3) {
-            if (mbRGB) {
-                cvtColor(mImGray, mImGray, CV_RGB2GRAY);
-                cvtColor(imGrayRight, imGrayRight, CV_RGB2GRAY);
-            } else {
-                cvtColor(mImGray, mImGray, CV_BGR2GRAY);
-                cvtColor(imGrayRight, imGrayRight, CV_BGR2GRAY);
-            }
-        } else if (mImGray.channels() == 4) {
-            if (mbRGB) {
-                cvtColor(mImGray, mImGray, CV_RGBA2GRAY);
-                cvtColor(imGrayRight, imGrayRight, CV_RGBA2GRAY);
-            } else {
-                cvtColor(mImGray, mImGray, CV_BGRA2GRAY);
-                cvtColor(imGrayRight, imGrayRight, CV_BGRA2GRAY);
-            }
-        }
+//        if (mImGray.channels() == 3) {
+//            if (mbRGB) {
+//                cvtColor(mImGray, mImGray, CV_RGB2GRAY);
+//                cvtColor(imGrayRight, imGrayRight, CV_RGB2GRAY);
+//            } else {
+//                cvtColor(mImGray, mImGray, CV_BGR2GRAY);
+//                cvtColor(imGrayRight, imGrayRight, CV_BGR2GRAY);
+//            }
+//        } else if (mImGray.channels() == 4) {
+//            if (mbRGB) {
+//                cvtColor(mImGray, mImGray, CV_RGBA2GRAY);
+//                cvtColor(imGrayRight, imGrayRight, CV_RGBA2GRAY);
+//            } else {
+//                cvtColor(mImGray, mImGray, CV_BGRA2GRAY);
+//                cvtColor(imGrayRight, imGrayRight, CV_BGRA2GRAY);
+//            }
+//        }
 
-        // 提取orb特征点
-        mCurrentFrame = Frame(mImGray,
-                              imGrayRight,
+        // 提取orb特征点, 设置当前帧
+        mCurrentFrame = Frame(mImGray, imGrayRight,
                               timestamp,
                               mpORBextractorLeft, mpORBextractorRight,
                               mpORBVocabulary,
@@ -353,6 +352,7 @@ namespace ORB_SLAM2 {
 
             // Create KeyFrame
             KeyFrame *pKFini = new KeyFrame(mCurrentFrame, mpMap, mpKeyFrameDB);
+            mCurrentFrame.mpReferenceKF = pKFini;
 
             // Insert KeyFrame in the map
             mpMap->AddKeyFrame(pKFini);
@@ -386,7 +386,7 @@ namespace ORB_SLAM2 {
             mpLocalMapper->InsertKeyFrame(pKFini);  // 局部建图线程启动, 第一帧一定是关键帧
 
 
-            // 从这里开始当前帧mCurrentFrame已经处理结束，对下一帧进行准备，第一帧变为上一帧，设置参考关键帧
+            /// 从这里开始当前帧mCurrentFrame已经处理结束，对下一帧进行准备，第一帧变为上一帧，设置参考关键帧
             mLastFrame = Frame(mCurrentFrame);
             mnLastKeyFrameId = mCurrentFrame.mnId;
             mpLastKeyFrame = pKFini;
@@ -394,7 +394,6 @@ namespace ORB_SLAM2 {
             mvpLocalKeyFrames.push_back(pKFini);
             mvpLocalMapPoints = mpMap->GetAllMapPoints();
             mpReferenceKF = pKFini;  // 设置参考关键帧, 在第二帧根据参考关键帧中使用
-            mCurrentFrame.mpReferenceKF = pKFini;
 
             mpMap->SetReferenceMapPoints(mvpLocalMapPoints);
 
@@ -404,7 +403,7 @@ namespace ORB_SLAM2 {
 
             mState = OK;
 
-//            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图
+            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
         }
     }
 
