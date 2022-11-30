@@ -66,7 +66,8 @@ int main(int argc, char **argv) {
 
         // Pass the images to the SLAM system
         SLAM.TrackStereo(imLeft, imRight, tframe);
-//        SLAM.LocalMapping_run();
+        // 如果要运行局部建图线程，需要把跟踪部分mCurrentFrame.mpReferenceKF->ComputeBoW(); 代码注释掉
+        SLAM.LocalMapping_run();
         SLAM.Viewer_run();
     }
 

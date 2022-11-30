@@ -28,22 +28,29 @@
 
 //#include <mutex>
 
-namespace ORB_SLAM2
-{
+namespace ORB_SLAM2 {
 
-    class MapDrawer
-    {
+    class MapDrawer {
     public:
         MapDrawer(Map *pMap, const string &strSettingPath);
 
         Map *mpMap;
 
         void DrawMapPoints();
+
         void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph);
+
         void DrawCurrentCamera(pangolin::OpenGlMatrix &Twc);
+
         void SetCurrentCameraPose(const cv::Mat &Tcw);
+
         void SetReferenceKeyFrame(KeyFrame *pKF);
+
         void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M);
+
+        void DrawTruth_poses();
+
+        Eigen::MatrixXd truth_poses; // n*3 xyz pose
 
     private:
         float mKeyFrameSize;

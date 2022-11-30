@@ -122,6 +122,7 @@ namespace ORB_SLAM2 {
         mpMapDrawer->DrawKeyFrames(true, true);
 //        if (menuShowPoints)
         mpMapDrawer->DrawMapPoints();
+        mpMapDrawer->DrawTruth_poses();
 
 
         // 绘制原点坐标系

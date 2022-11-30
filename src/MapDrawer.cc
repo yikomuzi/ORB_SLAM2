@@ -26,6 +26,39 @@
 
 namespace ORB_SLAM2 {
 
+    template<class T>
+    bool read_all_number_txt(const std::string txt_file_name,
+                             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &read_number_mat) {
+        if (!std::ifstream(txt_file_name)) {
+            std::cout << "ERROR!!! Cannot read txt file " << txt_file_name << std::endl;
+            return false;
+        }
+        std::ifstream filetxt(txt_file_name.c_str());
+        int row_counter = 0;
+        std::string line;
+        if (read_number_mat.rows() == 0)
+            read_number_mat.resize(100, 10);
+
+        while (getline(filetxt, line)) {
+            T t;
+            if (!line.empty()) {
+                std::stringstream ss(line);
+                int colu = 0;
+                while (ss >> t) {
+                    read_number_mat(row_counter, colu) = t;
+                    colu++;
+                }
+                row_counter++;
+                if (row_counter >= read_number_mat.rows()) // if matrix row is not enough, make more space.
+                    read_number_mat.conservativeResize(read_number_mat.rows() * 2, read_number_mat.cols());
+            }
+        }
+        filetxt.close();
+
+        read_number_mat.conservativeResize(row_counter, read_number_mat.cols()); // cut into actual rows
+
+        return true;
+    }
 
     MapDrawer::MapDrawer(Map *pMap, const string &strSettingPath) : mpMap(pMap) {
         cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
@@ -36,6 +69,29 @@ namespace ORB_SLAM2 {
         mPointSize = fSettings["Viewer.PointSize"];
         mCameraSize = fSettings["Viewer.CameraSize"];
         mCameraLineWidth = fSettings["Viewer.CameraLineWidth"];
+
+        // 读取真实的相机位姿路径
+        std::string truth_pose_txts = "/home/ubuntu/Desktop/cube_slam_study/dataset/seq_07/pose_truth.txt";
+        Eigen::MatrixXd truth_cam_poses(5, 8);
+        if (read_all_number_txt(truth_pose_txts, truth_cam_poses)) {
+            truth_poses.resize(truth_cam_poses.rows() / 10, 3);
+            for (int i = 0; i < truth_poses.rows(); i++) {
+                truth_poses.row(i) = truth_cam_poses.row(i * 10).segment(1, 3);
+                if (true) {
+                    Eigen::Quaterniond pose_quat(truth_cam_poses(i * 10, 7), truth_cam_poses(i * 10, 4),
+                                                 truth_cam_poses(i * 10, 5), truth_cam_poses(i * 10, 6));
+                    Eigen::Matrix4d pose_to_init;
+                    pose_to_init.setIdentity();
+                    pose_to_init.block(0, 0, 3, 3) = pose_quat.toRotationMatrix();
+                    pose_to_init.col(3).head<3>() = Eigen::Vector3d(truth_cam_poses(i * 10, 1),
+                                                                    truth_cam_poses(i * 10, 2),
+                                                                    truth_cam_poses(i * 10, 3));
+                    Eigen::Matrix4d pose_to_ground = pose_to_init;
+                    truth_poses.row(i) = pose_to_ground.col(3).head<3>();
+                }
+            }
+            cout << "Read sampled truth pose size for visualization:  " << truth_poses.rows() << endl;
+        }
 
     }
 
@@ -242,5 +298,16 @@ namespace ORB_SLAM2 {
         } else
             M.SetIdentity();
     }
+
+    void MapDrawer::DrawTruth_poses() {
+        glLineWidth(2);
+        glBegin(GL_LINE_STRIP); // line strip connects adjacent points
+        glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+        for (int pt_id = 0; pt_id < truth_poses.rows(); pt_id++) {
+            glVertex3f(truth_poses(pt_id, 0), truth_poses(pt_id, 1), truth_poses(pt_id, 2));
+        }
+        glEnd();
+    }
+
 
 } //namespace ORB_SLAM

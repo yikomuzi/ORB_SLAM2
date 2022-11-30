@@ -403,7 +403,7 @@ namespace ORB_SLAM2 {
 
             mState = OK;
 
-            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
+//            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
         }
     }
 
