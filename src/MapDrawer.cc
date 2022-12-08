@@ -71,25 +71,28 @@ namespace ORB_SLAM2 {
         mCameraLineWidth = fSettings["Viewer.CameraLineWidth"];
 
         // 读取真实的相机位姿路径
-        std::string truth_pose_txts = "/home/ubuntu/Desktop/cube_slam_study/dataset/seq_07/pose_truth.txt";
+        std::string truth_pose_txts = "/home/ubuntu/Desktop/iGibson_study/igibson_dataset/01/pose_truth.txt";
         Eigen::MatrixXd truth_cam_poses(5, 8);
         if (read_all_number_txt(truth_pose_txts, truth_cam_poses)) {
-            truth_poses.resize(truth_cam_poses.rows() / 10, 3);
+//            cout << truth_cam_poses << endl;
+            truth_poses.resize(truth_cam_poses.rows(), 3);
             for (int i = 0; i < truth_poses.rows(); i++) {
-                truth_poses.row(i) = truth_cam_poses.row(i * 10).segment(1, 3);
+                truth_poses.row(i) = truth_cam_poses.row(i).segment(1, 3);
                 if (true) {
-                    Eigen::Quaterniond pose_quat(truth_cam_poses(i * 10, 7), truth_cam_poses(i * 10, 4),
-                                                 truth_cam_poses(i * 10, 5), truth_cam_poses(i * 10, 6));
+                    Eigen::Quaterniond pose_quat(truth_cam_poses(i, 7), truth_cam_poses(i, 4),
+                                                 truth_cam_poses(i, 5), truth_cam_poses(i, 6));
                     Eigen::Matrix4d pose_to_init;
                     pose_to_init.setIdentity();
                     pose_to_init.block(0, 0, 3, 3) = pose_quat.toRotationMatrix();
-                    pose_to_init.col(3).head<3>() = Eigen::Vector3d(truth_cam_poses(i * 10, 1),
-                                                                    truth_cam_poses(i * 10, 2),
-                                                                    truth_cam_poses(i * 10, 3));
+                    pose_to_init.col(3).head<3>() = Eigen::Vector3d(truth_cam_poses(i, 1),
+                                                                    truth_cam_poses(i, 2),
+                                                                    truth_cam_poses(i, 3));
                     Eigen::Matrix4d pose_to_ground = pose_to_init;
                     truth_poses.row(i) = pose_to_ground.col(3).head<3>();
+//                    cout << truth_poses << endl;
                 }
             }
+//            cout << truth_poses << endl;
             cout << "Read sampled truth pose size for visualization:  " << truth_poses.rows() << endl;
         }
 

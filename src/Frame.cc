@@ -34,7 +34,7 @@ namespace ORB_SLAM2 {
     Frame::Frame() {
     }
 
-    // Copy Constructor
+    // Copy Constructor 复制构造函数
     Frame::Frame(const Frame &frame) :
             mpORBvocabulary(frame.mpORBvocabulary), mpORBextractorLeft(frame.mpORBextractorLeft),
             mpORBextractorRight(frame.mpORBextractorRight), mTimeStamp(frame.mTimeStamp), mK(frame.mK.clone()),
@@ -146,6 +146,74 @@ namespace ORB_SLAM2 {
         AssignFeaturesToGrid();
     }
 
+
+    // 用于RGBD模式, 在构造函数里就自动进行对图片帧的处理，提取特征点
+    Frame::Frame(const cv::Mat &imGray,
+                 const cv::Mat &imDepth,
+                 const double &timeStamp,
+                 ORBextractor *extractor,
+                 ORBVocabulary *voc,
+                 cv::Mat &K,
+                 cv::Mat &distCoef,
+                 const float &bf,
+                 const float &thDepth)
+            : mpORBvocabulary(voc),
+              mpORBextractorLeft(extractor),
+              mpORBextractorRight(static_cast<ORBextractor *>(NULL)),
+              mTimeStamp(timeStamp), mK(K.clone()),
+              mDistCoef(distCoef.clone()),
+              mbf(bf),
+              mThDepth(thDepth) {
+
+        // Frame ID
+        mnId = nNextId++;
+
+        // Scale Level Info
+        mnScaleLevels = mpORBextractorLeft->GetLevels();
+        mfScaleFactor = mpORBextractorLeft->GetScaleFactor();
+        mfLogScaleFactor = log(mfScaleFactor);
+        mvScaleFactors = mpORBextractorLeft->GetScaleFactors();
+        mvInvScaleFactors = mpORBextractorLeft->GetInverseScaleFactors();
+        mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();
+        mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
+
+        // 针对一帧图片提取特征点并计算描述子           ORB extraction
+        // 特征点被存进std::vector<cv::KeyPoint> mvKeys中，描述子被存入cv::Mat mDescriptors中
+        ExtractORB(0, imGray);
+
+        N = mvKeys.size();
+
+        if (mvKeys.empty())
+            return;
+
+        UndistortKeyPoints();  // 【存疑】这里貌似是对mvKeys进行去畸变，算出mvKeysUn。实际发现这两个变量一致
+
+        ComputeStereoFromRGBD(imDepth);
+
+        mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(NULL));
+        mvbOutlier = vector<bool>(N, false);
+
+        // This is done only for the first Frame (or after a change in the calibration)
+        if (mbInitialComputations) {
+            ComputeImageBounds(imGray);
+
+            mfGridElementWidthInv = static_cast<float>(FRAME_GRID_COLS) / static_cast<float>(mnMaxX - mnMinX);
+            mfGridElementHeightInv = static_cast<float>(FRAME_GRID_ROWS) / static_cast<float>(mnMaxY - mnMinY);
+
+            fx = K.at<float>(0, 0);
+            fy = K.at<float>(1, 1);
+            cx = K.at<float>(0, 2);
+            cy = K.at<float>(1, 2);
+            invfx = 1.0f / fx;
+            invfy = 1.0f / fy;
+
+            mbInitialComputations = false;
+        }
+
+        mb = mbf / fx;
+
+        AssignFeaturesToGrid();
+    }
 
     void Frame::AssignFeaturesToGrid() {
         int nReserve = 0.5f * N / (FRAME_GRID_COLS * FRAME_GRID_ROWS);
@@ -393,9 +461,9 @@ namespace ORB_SLAM2 {
         }
 
         // Set limits for search
-        const float minZ = mb;
+        const float minZ = mb;  // 左右目相机的距离
         const float minD = 0;
-        const float maxD = mbf / minZ;
+        const float maxD = mbf / minZ;  // 焦距（假设为fx）
 
         // For each left keypoint search a match in the right image
         vector<pair<int, int>> vDistIdx;
@@ -532,7 +600,7 @@ namespace ORB_SLAM2 {
         }
     }
 
-    void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth) {
+    void Frame::ComputeStereoFromRGBD(const cv::Mat &imDepth) {  // 利用RGBD图像计算右目图像
         mvuRight = vector<float>(N, -1);
         mvDepth = vector<float>(N, -1);
 

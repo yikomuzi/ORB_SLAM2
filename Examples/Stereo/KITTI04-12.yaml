@@ -21,7 +21,7 @@ Camera.height: 376
 # Camera frames per second 
 Camera.fps: 10.0
 
-# stereo baseline times fx
+# stereo baseline times fx  相机基线与焦距的乘积 (这里假设焦距为fx) 这里双目相机距离为0.537 （0.537*707=379）
 Camera.bf: 379.8145
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
@@ -60,7 +60,7 @@ Viewer.PointSize: 2
 Viewer.CameraSize: 0.7
 Viewer.CameraLineWidth: 3
 Viewer.ViewpointX: 0
-Viewer.ViewpointY: -100
-Viewer.ViewpointZ: 0
+Viewer.ViewpointY: -50
+Viewer.ViewpointZ: -50
 Viewer.ViewpointF: 250
 

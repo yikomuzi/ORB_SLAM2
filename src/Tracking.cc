@@ -62,7 +62,7 @@ namespace ORB_SLAM2 {
             mpMap(pMap),
             mnLastRelocFrameId(0) {
 
-        // Load camera parameters from settings file
+        /// Load camera parameters from settings file
         cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
         float fx = fSettings["Camera.fx"];
         float fy = fSettings["Camera.fy"];
@@ -89,7 +89,7 @@ namespace ORB_SLAM2 {
         }
         DistCoef.copyTo(mDistCoef);
 
-        mbf = fSettings["Camera.bf"];
+        mbf = fSettings["Camera.bf"];  // 相机基线与焦距的乘积
 
         float fps = fSettings["Camera.fps"];
         if (fps == 0)
@@ -120,8 +120,7 @@ namespace ORB_SLAM2 {
         else
             cout << "- color order: BGR (ignored if grayscale)" << endl;
 
-        // Load ORB parameters
-
+        /// Load ORB parameters
         int nFeatures = fSettings["ORBextractor.nFeatures"];
         float fScaleFactor = fSettings["ORBextractor.scaleFactor"];
         int nLevels = fSettings["ORBextractor.nLevels"];
@@ -133,11 +132,10 @@ namespace ORB_SLAM2 {
         if (sensor == System::STEREO)
             mpORBextractorRight = new ORBextractor(nFeatures, fScaleFactor, nLevels, fIniThFAST, fMinThFAST);
 
-        if (sensor == System::MONOCULAR)
-            mpIniORBextractor = new ORBextractor(2 * nFeatures, fScaleFactor, nLevels, fIniThFAST, fMinThFAST);
+//        if (sensor == System::MONOCULAR)
+//            mpIniORBextractor = new ORBextractor(2 * nFeatures, fScaleFactor, nLevels, fIniThFAST, fMinThFAST);
 
-        cout << endl
-             << "ORB Extractor Parameters: " << endl;
+        cout << endl << "ORB Extractor Parameters: " << endl;
         cout << "- Number of Features: " << nFeatures << endl;
         cout << "- Scale Levels: " << nLevels << endl;
         cout << "- Scale Factor: " << fScaleFactor << endl;
@@ -146,8 +144,7 @@ namespace ORB_SLAM2 {
 
         if (sensor == System::STEREO || sensor == System::RGBD) {
             mThDepth = mbf * (float) fSettings["ThDepth"] / fx;
-            cout << endl
-                 << "Depth Threshold (Close/Far Points): " << mThDepth << endl;
+            cout << endl << "Depth Threshold (Close/Far Points): " << mThDepth << endl;
         }
 
         if (sensor == System::RGBD) {
@@ -203,6 +200,46 @@ namespace ORB_SLAM2 {
                               mbf,
                               mThDepth);
 
+        Track();
+
+        return mCurrentFrame.mTcw.clone();
+    }
+
+    /// 【重要】跟踪线程核心功能入口
+    cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, const double &timestamp) {
+        mImGray = imRGB;
+        cv::Mat imDepth = imD;
+
+        if (mImGray.channels() == 3) {
+            if (mbRGB)
+                cvtColor(mImGray, mImGray, CV_RGB2GRAY);
+            else
+                cvtColor(mImGray, mImGray, CV_BGR2GRAY);
+        } else if (mImGray.channels() == 4) {
+            if (mbRGB)
+                cvtColor(mImGray, mImGray, CV_RGBA2GRAY);
+            else
+                cvtColor(mImGray, mImGray, CV_BGRA2GRAY);
+        }
+
+        if ((fabs(mDepthMapFactor - 1.0f) > 1e-5) || imDepth.type() != CV_32F) {
+//            cout << imDepth << endl;
+            imDepth.convertTo(imDepth, CV_32F, mDepthMapFactor);
+//            cout << imDepth << endl;
+        }
+
+        // 【关键】对图片帧进行处理，提取特征点
+        mCurrentFrame = Frame(mImGray,
+                              imDepth,
+                              timestamp,
+                              mpORBextractorLeft,
+                              mpORBVocabulary,
+                              mK,
+                              mDistCoef,
+                              mbf,
+                              mThDepth);  // 在这里就进行了特征点的提取
+
+        // 【关键】
         Track();
 
         return mCurrentFrame.mTcw.clone();
@@ -347,8 +384,14 @@ namespace ORB_SLAM2 {
     void Tracking::StereoInitialization() {
         cout << "[Tracking] Tracking::StereoInitialization()-----------" << endl;
         if (mCurrentFrame.N > 500) {
-            // Set Frame pose to the origin
-            mCurrentFrame.SetPose(cv::Mat::eye(4, 4, CV_32F));
+            // Set Frame pose to the origin  设置相机的初始位姿，默认为cv::Mat::eye(4, 4, CV_32F)
+            cv::Mat init_T = (cv::Mat_<float>(4, 4)
+                    <<
+                    -2.80383462e-01, -9.59888074e-01, -5.69314896e-18, 1.09072734e+00,
+                    9.29223980e-02, -2.71426475e-02, -9.95303323e-01, 8.56764310e-01,
+                    9.55379790e-01, -2.79066591e-01, 9.68054511e-02, 1.80683047e+00,
+                    0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e+00);
+            mCurrentFrame.SetPose(init_T);
 
             // Create KeyFrame
             KeyFrame *pKFini = new KeyFrame(mCurrentFrame, mpMap, mpKeyFrameDB);
@@ -403,7 +446,7 @@ namespace ORB_SLAM2 {
 
             mState = OK;
 
-//            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
+            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
         }
     }
 
@@ -617,12 +660,12 @@ namespace ORB_SLAM2 {
     }
 
     bool Tracking::NeedNewKeyFrame() {
-        if (mbOnlyTracking)
-            return false;
+//        if (mbOnlyTracking)
+//            return false;
 
-        // If Local Mapping is freezed by a Loop Closure do not insert keyframes
-        if (mpLocalMapper->isStopped() || mpLocalMapper->stopRequested())
-            return false;
+//        // If Local Mapping is freezed by a Loop Closure do not insert keyframes
+//        if (mpLocalMapper->isStopped() || mpLocalMapper->stopRequested())
+//            return false;
 
         const int nKFs = mpMap->KeyFramesInMap();
 

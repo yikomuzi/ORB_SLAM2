@@ -20,4 +20,5 @@ lib/
 .idea
 cmake-build-debug
 CameraTrajectory.txt
+KeyFrameTrajectory.txt
 

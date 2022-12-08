@@ -195,7 +195,7 @@ namespace ORB_SLAM2 {
         // Calibration matrix
         cv::Mat mK;
         cv::Mat mDistCoef;  // 相机的畸变参数（4个或5个）
-        float mbf;
+        float mbf;  // 相机基线与焦距的乘积
 
         // New KeyFrame rules (according to fps)
         int mMinFrames;

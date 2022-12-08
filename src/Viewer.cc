@@ -119,7 +119,7 @@ namespace ORB_SLAM2 {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         mpMapDrawer->DrawCurrentCamera(Twc);
 //        if (menuShowKeyFrames || menuShowGraph)
-        mpMapDrawer->DrawKeyFrames(true, true);
+        mpMapDrawer->DrawKeyFrames(true, false);
 //        if (menuShowPoints)
         mpMapDrawer->DrawMapPoints();
         mpMapDrawer->DrawTruth_poses();
@@ -130,13 +130,13 @@ namespace ORB_SLAM2 {
         glBegin(GL_LINES);
         glColor3f(1.0f, 0.0f, 0.0f);
         glVertex3f(0, 0, 0);
-        glVertex3f(100, 0, 0);
+        glVertex3f(1, 0, 0);
         glColor3f(0.0f, 1.0f, 0.0f);
         glVertex3f(0, 0, 0);
-        glVertex3f(0, 100, 0);
+        glVertex3f(0, 1, 0);
         glColor3f(0.0f, 0.0f, 1.0f);
         glVertex3f(0, 0, 0);
-        glVertex3f(0, 0, 100);
+        glVertex3f(0, 0, 1);
         glEnd();
 
 

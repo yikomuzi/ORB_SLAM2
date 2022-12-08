@@ -139,6 +139,56 @@ namespace ORB_SLAM2 {
     }
 
 
+    cv::Mat System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const double &timestamp) {
+        cout << "[info] System::TrackRGBD begin--------------------" << count_System_TrackRGBD++ << endl;
+
+//        if (mSensor != RGBD) {
+//            cerr << "ERROR: you called TrackRGBD but input sensor was not set to RGBD." << endl;
+//            exit(-1);
+//        }
+//
+//        // 【存疑】这部分感觉用处不大，可能和定位模式有关？    Check mode change
+//        {
+//            unique_lock<mutex> lock(mMutexMode);
+//            if (mbActivateLocalizationMode) {
+//                mpLocalMapper->RequestStop();
+//
+//                // Wait until Local Mapping has effectively stopped
+//                while (!mpLocalMapper->isStopped()) {
+//                    usleep(1000);
+//                }
+//
+//                mpTracker->InformOnlyTracking(true);
+//                mbActivateLocalizationMode = false;
+//            }
+//
+//            if (mbDeactivateLocalizationMode) {
+//                mpTracker->InformOnlyTracking(false);
+//                mpLocalMapper->Release();
+//                mbDeactivateLocalizationMode = false;
+//            }
+//        }
+//
+//        // 【存疑】用处不大  Check reset
+//        {
+//            unique_lock<mutex> lock(mMutexReset);
+//            if (mbReset) {
+//                mpTracker->Reset();
+//                mbReset = false;
+//            }
+//        }
+
+        // 【重要】下面代码基本每次循环都会执行
+        cv::Mat Tcw = mpTracker->GrabImageRGBD(im, depthmap, timestamp);
+
+//        unique_lock<mutex> lock2(mMutexState);
+//        mTrackingState = mpTracker->mState;
+//        mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
+//        mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
+        return Tcw;
+    }
+
+
     void System::ActivateLocalizationMode() {
 //        unique_lock<mutex> lock(mMutexMode);
 //        mbActivateLocalizationMode = true;
@@ -195,7 +245,7 @@ namespace ORB_SLAM2 {
 
         // Transform all keyframes so that the first keyframe is at the origin.
         // After a loop closure the first keyframe might not be at the origin.
-        cv::Mat Two = vpKFs[0]->GetPoseInverse();
+//        cv::Mat Two = vpKFs[0]->GetPoseInverse();
 
         ofstream f;
         f.open(filename.c_str());
@@ -226,7 +276,7 @@ namespace ORB_SLAM2 {
                 pKF = pKF->GetParent();
             }
 
-            Trw = Trw * pKF->GetPose() * Two;
+            Trw = Trw * pKF->GetPose();
 
             cv::Mat Tcw = (*lit) * Trw;
             cv::Mat Rwc = Tcw.rowRange(0, 3).colRange(0, 3).t();
