@@ -114,11 +114,11 @@ namespace ORB_SLAM2 {
         mvpKeyFrameOrigins.clear();
     }
 
-    void Map::test_critical_variables(string s) {
+    void Map::print_critical_variables(string s) {
         auto kf = GetAllKeyFrames();
         auto p = GetAllMapPoints();
         auto rp = GetReferenceMapPoints();
-        cout << "[" << s << "] " << "kf.size(): " << kf.size() << "    p.size(): " << p.size() << "    rp.size(): "
+        cout << "[" << s << "] " << "关键帧数量: " << kf.size() << "    路标点数量: " << p.size() << "    参考路标点数量: "
              << rp.size()
              << endl;
     }

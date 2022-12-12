@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
     string voc_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Vocabulary/ORBvoc.txt";
     string config_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/RGB-D/igibson.yaml";
-    string datasets_path = "/home/ubuntu/Desktop/iGibson_study/igibson_dataset/01/";
+    string datasets_path = "/home/ubuntu/Desktop/iGibson_study/igibson_dataset/01";
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(voc_path, config_path, ORB_SLAM2::System::RGBD, true);
 
@@ -64,14 +64,14 @@ int main(int argc, char **argv) {
         // Read image and depthmap from file
         imRGB = cv::imread(string(datasets_path) + "/rgb/" + to_string(ni) + ".png", CV_LOAD_IMAGE_UNCHANGED);
         imD = cv::imread(string(datasets_path) + "/depth/" + to_string(ni) + ".png", CV_LOAD_IMAGE_UNCHANGED);
-        cout << imRGB.channels() << endl;
-        cout << imD.channels() << endl;
+//        cout << imRGB.channels() << endl;
+//        cout << imD.channels() << endl;
 //        double tframe = vTimestamps[ni];
 
         // Pass the image to the SLAM system
         SLAM.TrackRGBD(imRGB, imD, ni);
-        // 如果要运行局部建图线程，需要把跟踪部分mCurrentFrame.mpReferenceKF->ComputeBoW(); 代码注释掉
-//        SLAM.LocalMapping_run();
+        //【该方法淘汰，localmapping前一段还是要运行的】 如果要运行局部建图线程，需要把跟踪部分mCurrentFrame.mpReferenceKF->ComputeBoW(); 代码注释掉
+        SLAM.LocalMapping_run();
         SLAM.Viewer_run();
 
     }

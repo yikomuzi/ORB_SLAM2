@@ -217,11 +217,12 @@ namespace ORB_SLAM2 {
 
     }
 
+    // 顶点只有一个相机位姿，误差边的个数等于路标点个数
     int Optimizer::PoseOptimization(Frame *pFrame) {
         g2o::SparseOptimizer optimizer;
         g2o::BlockSolver_6_3::LinearSolverType *linearSolver;
 
-        linearSolver = new g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>();
+        linearSolver = new g2o::LinearSolverDense<g2o::BlockSolver_6_3::PoseMatrixType>();  // 求解线性方程使用cholesky分解方法
 
         g2o::BlockSolver_6_3 *solver_ptr = new g2o::BlockSolver_6_3(linearSolver);
 
@@ -230,7 +231,7 @@ namespace ORB_SLAM2 {
 
         int nInitialCorrespondences = 0;
 
-        // Set Frame vertex
+        // 顶点（相机位姿） Set Frame vertex
         g2o::VertexSE3Expmap *vSE3 = new g2o::VertexSE3Expmap();
         vSE3->setEstimate(Converter::toSE3Quat(pFrame->mTcw));
         vSE3->setId(0);
@@ -240,24 +241,26 @@ namespace ORB_SLAM2 {
         // Set MapPoint vertices
         const int N = pFrame->N;
 
-        vector<g2o::EdgeSE3ProjectXYZOnlyPose *> vpEdgesMono;
-        vector<size_t> vnIndexEdgeMono;
+        // 单目
+        vector<g2o::EdgeSE3ProjectXYZOnlyPose *> vpEdgesMono; // 所有误差边的集合
+        vector<size_t> vnIndexEdgeMono;  // 所有误差边id的集合
         vpEdgesMono.reserve(N);
         vnIndexEdgeMono.reserve(N);
 
+        // 双目
         vector<g2o::EdgeStereoSE3ProjectXYZOnlyPose *> vpEdgesStereo;
         vector<size_t> vnIndexEdgeStereo;
         vpEdgesStereo.reserve(N);
         vnIndexEdgeStereo.reserve(N);
 
+        // huber鲁棒核函数参数（鲁棒核函数目的同ransac，为了减少错误值对误差优化的影响）
         const float deltaMono = sqrt(5.991);
         const float deltaStereo = sqrt(7.815);
 
 
         {
 //            unique_lock<mutex> lock(MapPoint::mGlobalMutex);
-
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) {  // 对每一个路标点进行遍历
                 MapPoint *pMP = pFrame->mvpMapPoints[i];
                 if (pMP) {
                     // Monocular observation
@@ -265,7 +268,7 @@ namespace ORB_SLAM2 {
                         nInitialCorrespondences++;
                         pFrame->mvbOutlier[i] = false;
 
-                        Eigen::Matrix<double, 2, 1> obs;
+                        Eigen::Matrix<double, 2, 1> obs; // 测量值，二维，一个像素点
                         const cv::KeyPoint &kpUn = pFrame->mvKeysUn[i];
                         obs << kpUn.pt.x, kpUn.pt.y;
 
@@ -302,7 +305,7 @@ namespace ORB_SLAM2 {
                         Eigen::Matrix<double, 3, 1> obs;
                         const cv::KeyPoint &kpUn = pFrame->mvKeysUn[i];
                         const float &kp_ur = pFrame->mvuRight[i];
-                        obs << kpUn.pt.x, kpUn.pt.y, kp_ur;
+                        obs << kpUn.pt.x, kpUn.pt.y, kp_ur;  // 路标点在左目的x位置，y位置，在右目中的x位置
 
                         g2o::EdgeStereoSE3ProjectXYZOnlyPose *e = new g2o::EdgeStereoSE3ProjectXYZOnlyPose();
 

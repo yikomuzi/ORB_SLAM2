@@ -66,7 +66,7 @@ namespace ORB_SLAM2 {
         void clear();
 
 
-        void test_critical_variables(string s);
+        void print_critical_variables(string s);
 
 
         vector<KeyFrame *> mvpKeyFrameOrigins;

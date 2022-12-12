@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     vector<string> vstrImageFilenamesRGB;
     vector<string> vstrImageFilenamesD;
     vector<double> vTimestamps;
-    string strAssociationFilename = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/RGB-D/associations/fr1_xyz.txt";
+    string strAssociationFilename = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/RGB-D/associations/rgbd_dataset_freibu rg3_structure_notexture_far.txt";
     LoadImages(strAssociationFilename, vstrImageFilenamesRGB, vstrImageFilenamesD, vTimestamps);
 
     // Check consistency in the number of images and depthmaps
@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
     }
 
     string voc_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Vocabulary/ORBvoc.txt";
-    string config_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/RGB-D/TUM1.yaml";
-    string datasets_path = "/remote-home/2132917/SLAM_datasets/rgbd_dataset_freiburg1_xyz";
+    string config_path = "/home/ubuntu/Desktop/ORB_SLAM2_study/ORB_SLAM2/Examples/RGB-D/TUM3.yaml";
+    string datasets_path = "/remote-home/2132917/Desktop/TUM_dataset/rgbd_dataset_freiburg3_structure_notexture_far";
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(voc_path, config_path, ORB_SLAM2::System::RGBD, true);
 

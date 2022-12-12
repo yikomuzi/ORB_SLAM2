@@ -39,7 +39,7 @@ namespace g2o {
 
   using namespace Eigen;
 
-  template <int D, typename E, typename VertexXi>
+  template <int D, typename E, typename VertexXi>  // VertexXi代表边连接的顶点的类型
   class BaseUnaryEdge : public BaseEdge<D,E>
   {
     public:

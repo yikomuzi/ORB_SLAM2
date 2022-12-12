@@ -51,7 +51,7 @@ namespace ORB_SLAM2 {
             cout << "[LocalMapping] CheckNewKeyFrames true---------------------------------------------"
                  << count_LocalMapping_RunCheckNewKeyFrames++ << endl;
 
-            mpMap->test_critical_variables("LocalMapping1");
+            mpMap->print_critical_variables("LocalMapping1");
 
             // BoW conversion and insertion in Map
             ProcessNewKeyFrame();
@@ -71,19 +71,21 @@ namespace ORB_SLAM2 {
 
             mbAbortBA = false;
 
-            if (!CheckNewKeyFrames() && !stopRequested()) {
-                // Local BA
-                if (mpMap->KeyFramesInMap() > 2)
-                    Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
+//            return;
 
-                mpMap->test_critical_variables("LocalMapping2");
+            if (!CheckNewKeyFrames() && !stopRequested()) {
+//                // Local BA
+//                if (mpMap->KeyFramesInMap() > 2)
+//                    Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
+
+                mpMap->print_critical_variables("LocalMapping2");
                 // Check redundant local Keyframes
                 KeyFrameCulling();
             }
 
 //                mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
 
-            mpMap->test_critical_variables("LocalMapping3");
+            mpMap->print_critical_variables("LocalMapping3");
 
         }
 
@@ -111,7 +113,7 @@ namespace ORB_SLAM2 {
                 cout << "[LocalMapping] CheckNewKeyFrames true---------------------------------------------"
                      << count_LocalMapping_RunCheckNewKeyFrames++ << endl;
 
-                mpMap->test_critical_variables("LocalMapping1");
+                mpMap->print_critical_variables("LocalMapping1");
 
                 // BoW conversion and insertion in Map
                 ProcessNewKeyFrame();
@@ -136,14 +138,14 @@ namespace ORB_SLAM2 {
                     if (mpMap->KeyFramesInMap() > 2)
                         Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
 
-                    mpMap->test_critical_variables("LocalMapping2");
+                    mpMap->print_critical_variables("LocalMapping2");
                     // Check redundant local Keyframes
                     KeyFrameCulling();
                 }
 
 //                mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
 
-                mpMap->test_critical_variables("LocalMapping3");
+                mpMap->print_critical_variables("LocalMapping3");
 
             } else if (Stop()) {
                 cout << "[info] Stop()-------------" << endl;

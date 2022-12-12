@@ -107,10 +107,11 @@ namespace ORB_SLAM2 {
         std::vector<cv::Point3f> mvIniP3D;
         Frame mInitialFrame;
 
+        // 这些变量用于最后生成相机轨迹（相机轨迹首先以关键帧作为锚点，再跟进每一帧相对于关键帧的位姿推出所有帧的位姿，即相机轨迹）
         // Lists used to recover the full camera trajectory at the end of the execution.
         // Basically we store the reference keyframe for each frame and its relative transformation
-        list <cv::Mat> mlRelativeFramePoses;
-        list<KeyFrame *> mlpReferences;
+        list <cv::Mat> mlRelativeFramePoses; // 当前帧相对于参考帧的位姿
+        list<KeyFrame *> mlpReferences;  // 所有参考帧的集合
         list<double> mlFrameTimes;
         list<bool> mlbLost;
 

@@ -99,7 +99,7 @@ namespace ORB_SLAM2 {
         static long unsigned int nNextId;
         long int mnFirstKFid;
         long int mnFirstFrame;
-        int nObs;
+        int nObs;  // 该路标点被帧观察到的次数
 
         // Variables used by the tracking
         float mTrackProjX;

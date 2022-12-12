@@ -188,6 +188,15 @@ namespace ORB_SLAM2 {
 
         UndistortKeyPoints();  // 【存疑】这里貌似是对mvKeys进行去畸变，算出mvKeysUn。实际发现这两个变量一致
 
+        cout << "[Frame]该帧共检测到特征点数目：" << mvKeysUn.size() << endl;
+        cv::Mat im(480, 640, CV_8UC3, cv::Scalar(255, 255, 255));
+        for (int i = 0; i <= mvKeys.size() - 1; i++) {
+            cv::circle(im, mvKeysUn[i].pt, 1, cv::Scalar(0, 0, 255), 1);
+        }
+        cv::imshow("im", im);
+//        cv::waitKey(1000 * 1);
+
+
         ComputeStereoFromRGBD(imDepth);
 
         mvpMapPoints = vector<MapPoint *>(N, static_cast<MapPoint *>(NULL));
@@ -631,6 +640,16 @@ namespace ORB_SLAM2 {
             return mRwc * x3Dc + mOw;
         } else
             return cv::Mat();
+    }
+
+    int Frame::count_mappoints() {
+        int c = 0;
+        for (int i = 0; i <= mvpMapPoints.size() - 1; i++) {
+            if (mvpMapPoints[i] != nullptr) {
+                c++;
+            }
+        }
+        return c;
     }
 
 } // namespace ORB_SLAM

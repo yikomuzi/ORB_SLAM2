@@ -139,7 +139,7 @@ namespace ORB_SLAM2 {
         float mThDepth;
 
         // Number of KeyPoints.
-        int N;
+        int N;  // 该帧检测到的关键点个数
 
         // Vector of keypoints (original for visualization) and undistorted (actually used by the system).
         // In the stereo case, mvKeysUn is redundant as images must be rectified.
@@ -160,7 +160,7 @@ namespace ORB_SLAM2 {
         cv::Mat mDescriptors, mDescriptorsRight;
 
         // MapPoints associated to keypoints, NULL pointer if no association.
-        std::vector<MapPoint *> mvpMapPoints;  // Frame中会引用MapPoint
+        std::vector<MapPoint *> mvpMapPoints;  // 该帧关键点对应的路标点, 当然，并不是所有的关键点都能对应上路标点       Frame中会引用MapPoint
 
         // Flag to identify outlier associations.
         std::vector<bool> mvbOutlier;
@@ -196,6 +196,8 @@ namespace ORB_SLAM2 {
         static float mnMaxY;
 
         static bool mbInitialComputations;
+
+        int count_mappoints();
 
     private:
         // Undistort keypoints given OpenCV distortion parameters.

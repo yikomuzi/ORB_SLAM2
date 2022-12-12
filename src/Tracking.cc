@@ -238,6 +238,7 @@ namespace ORB_SLAM2 {
                               mDistCoef,
                               mbf,
                               mThDepth);  // 在这里就进行了特征点的提取
+//        cout << "当前帧的地址：" << &mCurrentFrame << endl;
 
         // 【关键】
         Track();
@@ -248,7 +249,7 @@ namespace ORB_SLAM2 {
 
     void Tracking::Track() {
 
-        mpMap->test_critical_variables("Tracking1");
+        mpMap->print_critical_variables("Tracking1");
 
         if (mState == NO_IMAGES_YET) {
             mState = NOT_INITIALIZED;
@@ -270,9 +271,10 @@ namespace ORB_SLAM2 {
             // System is initialized. Track Frame.
             bool bOK;
 
-            // Local Mapping might have changed some MapPoints tracked in last frame
-            CheckReplacedInLastFrame();
+            // Local Mapping might have changed some MapPoints tracked in last frame 我觉得如果在localmapping里不做BA，那么应该不需要调整路标点
+//            CheckReplacedInLastFrame();
 
+            //  根据上一帧利用运动模型或参考关键帧进行粗跟踪
             if (mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2) {
                 bOK = TrackReferenceKeyFrame();                 // 根据参考帧进行跟踪
             } else {
@@ -282,15 +284,23 @@ namespace ORB_SLAM2 {
             }
 
             mCurrentFrame.mpReferenceKF = mpReferenceKF;
+            cout << "参考关键帧地址：" << mpReferenceKF << endl;
 
-            // If we have an initial estimation of the camera pose and matching. Track the local map.
+            // 利用局部地图对位姿进行调整 If we have an initial estimation of the camera pose and matching. Track the local map.
             if (bOK)
                 bOK = TrackLocalMap();                // 跟踪局部地图,进一步优化当前帧位姿
 
+            cout << "参考关键帧地址：" << mpReferenceKF << endl;
+            cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
+
             if (bOK)
                 mState = OK;
-            else
+            else {
                 mState = LOST;
+                cout << "----------------------跟踪失败!!!!!--------------------" << endl;
+                sleep(1000000);
+            }
+
 
             // Update drawer
             mpFrameDrawer->Update(this);
@@ -320,15 +330,19 @@ namespace ORB_SLAM2 {
 
                 // Delete temporal MapPoints
                 for (list<MapPoint *>::iterator lit = mlpTemporalPoints.begin(), lend = mlpTemporalPoints.end();
-                     lit != lend; lit++) {
+                     lit != lend;
+                     lit++) {
                     MapPoint *pMP = *lit;
                     delete pMP;
                 }
                 mlpTemporalPoints.clear();
 
                 // 【关键】判断当前帧是否为关键帧    Check if we need to insert a new keyframe
-                if (NeedNewKeyFrame())
+                if (NeedNewKeyFrame()) {
+                    cout << "--------------新的关键帧---------------" << endl;
                     CreateNewKeyFrame();
+                }
+
 
                 // We allow points with high innovation (considererd outliers by the Huber Function)
                 // pass to the new keyframe, so that bundle adjustment will finally decide
@@ -338,15 +352,7 @@ namespace ORB_SLAM2 {
                     if (mCurrentFrame.mvpMapPoints[i] && mCurrentFrame.mvbOutlier[i])
                         mCurrentFrame.mvpMapPoints[i] = static_cast<MapPoint *>(NULL);
                 }
-            }
-
-            // Reset if the camera get lost soon after initialization
-            if (mState == LOST) {
-                if (mpMap->KeyFramesInMap() <= 5) {
-                    cout << "Track lost soon after initialisation, reseting..." << endl;
-                    mpSystem->Reset();
-                    return;
-                }
+                cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
             }
 
             if (!mCurrentFrame.mpReferenceKF)
@@ -354,8 +360,6 @@ namespace ORB_SLAM2 {
 
             mLastFrame = Frame(mCurrentFrame);
         }
-
-
 
 
 
@@ -377,7 +381,7 @@ namespace ORB_SLAM2 {
         }
 
 
-        mpMap->test_critical_variables("Tracking2");
+        mpMap->print_critical_variables("Tracking2");
 
     }
 
@@ -387,9 +391,9 @@ namespace ORB_SLAM2 {
             // Set Frame pose to the origin  设置相机的初始位姿，默认为cv::Mat::eye(4, 4, CV_32F)
             cv::Mat init_T = (cv::Mat_<float>(4, 4)
                     <<
-                    -2.80383462e-01, -9.59888074e-01, -5.69314896e-18, 1.09072734e+00,
-                    9.29223980e-02, -2.71426475e-02, -9.95303323e-01, 8.56764310e-01,
-                    9.55379790e-01, -2.79066591e-01, 9.68054511e-02, 1.80683047e+00,
+                    -1.91689493e-01, -9.81455622e-01, -5.33113736e-18, 1.06143434e+00,
+                    3.12491384e-01, -6.10331365e-02, -9.47957853e-01, 1.19517813e+00,
+                    9.30378564e-01, -1.81713560e-01, 3.18395837e-01, 1.42950729e+00,
                     0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e+00);
             mCurrentFrame.SetPose(init_T);
 
@@ -401,7 +405,7 @@ namespace ORB_SLAM2 {
             mpMap->AddKeyFrame(pKFini);
 
 
-            /// 根据有效的特征点（左右目能匹配）构造mappoint   Create MapPoints and asscoiate to KeyFrame
+            /// 根据有效的特征点（左右目能匹配）构造mappoint       Create MapPoints and asscoiate to KeyFrame
             for (int i = 0; i < mCurrentFrame.N; i++) {
                 float z = mCurrentFrame.mvDepth[i];
                 if (z > 0) {
@@ -416,14 +420,15 @@ namespace ORB_SLAM2 {
                     mCurrentFrame.mvpMapPoints[i] = pNewMP;
                 }
             }
+            cout << "第一帧特征点匹配出的路标点个数为(全部作为初始的路标点)：" << mCurrentFrame.count_mappoints() << endl;
 
-            int count_mvuRight_available = 0;
-            for (int i = 0; i < mCurrentFrame.mvuRight.size(); i++) {
-                if (mCurrentFrame.mvuRight[i] >= 0) {
-                    count_mvuRight_available++;
-                }
-            }
-            cout << "count_mvuRight_available: " << count_mvuRight_available << endl;
+//            int count_mvuRight_available = 0;
+//            for (int i = 0; i < mCurrentFrame.mvuRight.size(); i++) {
+//                if (mCurrentFrame.mvuRight[i] >= 0) {
+//                    count_mvuRight_available++;
+//                }
+//            }
+//            cout << "count_mvuRight_available: " << count_mvuRight_available << endl;
             cout << "New map created with " << mpMap->MapPointsInMap() << " points" << endl;
 
             mpLocalMapper->InsertKeyFrame(pKFini);  // 局部建图线程启动, 第一帧一定是关键帧
@@ -446,7 +451,7 @@ namespace ORB_SLAM2 {
 
             mState = OK;
 
-            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
+//            mCurrentFrame.mpReferenceKF->ComputeBoW();  // 【该方法淘汰，localmapping前一段还是要运行的】彻底去耦合局部建图(如果不运行局部建图部分代码，则需要把这行代码加上)
         }
     }
 
@@ -464,7 +469,7 @@ namespace ORB_SLAM2 {
     }
 
     bool Tracking::TrackReferenceKeyFrame() {
-        cout << "[Tracking] Tracking::TrackReferenceKeyFrame()-------------" << endl;
+        cout << "[Tracking] Tracking::TrackReferenceKeyFrame()-----------" << endl;
         // Compute Bag of Words vector
         mCurrentFrame.ComputeBoW();
 
@@ -474,7 +479,6 @@ namespace ORB_SLAM2 {
         vector<MapPoint *> vpMapPointMatches;
 
         int nmatches = matcher.SearchByBoW(mpReferenceKF, mCurrentFrame, vpMapPointMatches);
-
         cout << "[Tracking] TrackReferenceKeyFrame nmatches: " << nmatches << endl;
 
         if (nmatches < 15)
@@ -482,8 +486,13 @@ namespace ORB_SLAM2 {
 
         mCurrentFrame.mvpMapPoints = vpMapPointMatches;
         mCurrentFrame.SetPose(mLastFrame.mTcw);
+        cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
 
+
+//        cout << "[参考关键帧跟踪]当前帧跟踪前的位姿： " << endl << mCurrentFrame.mTcw << endl;
         Optimizer::PoseOptimization(&mCurrentFrame);
+//        cout << "[参考关键帧跟踪]当前帧跟踪后的位姿： " << endl << mCurrentFrame.mTcw << endl;
+        cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
 
         // Discard outliers
         int nmatchesMap = 0;
@@ -592,8 +601,12 @@ namespace ORB_SLAM2 {
         if (nmatches < 20)
             return false;
 
+        cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
         // Optimize frame pose with all matches
+//        cout << "[运动模型跟踪]当前帧跟踪前的位姿： " << endl << mCurrentFrame.mTcw << endl;
         Optimizer::PoseOptimization(&mCurrentFrame);
+//        cout << "[运动模型跟踪]当前帧跟踪后的位姿： " << endl << mCurrentFrame.mTcw << endl;
+        cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
 
         // Discard outliers
         int nmatchesMap = 0;
@@ -740,8 +753,10 @@ namespace ORB_SLAM2 {
 
         KeyFrame *pKF = new KeyFrame(mCurrentFrame, mpMap, mpKeyFrameDB);
 
+        cout << "当前的参考关键帧地址：" << mpReferenceKF << endl;
         mpReferenceKF = pKF;  // 修改当前Tracking线程的参考关键帧
         mCurrentFrame.mpReferenceKF = pKF;  // 修改当前帧的参考关键帧
+        cout << "修改参考关键帧地址为：" << mpReferenceKF << endl;
 
         if (mSensor != System::MONOCULAR) {
             mCurrentFrame.UpdatePoseMatrices();
@@ -845,7 +860,9 @@ namespace ORB_SLAM2 {
             // If the camera has been relocalised recently, perform a coarser search
             if (mCurrentFrame.mnId < mnLastRelocFrameId + 2)
                 th = 5;
-            matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th);
+            cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
+            matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th);  // 该步骤会增加当前帧的路标点
+            cout << "当前帧特征点中匹配到的路标点个数为：" << mCurrentFrame.count_mappoints() << endl;
         }
     }
 

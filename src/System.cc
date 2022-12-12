@@ -140,7 +140,8 @@ namespace ORB_SLAM2 {
 
 
     cv::Mat System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const double &timestamp) {
-        cout << "[info] System::TrackRGBD begin--------------------" << count_System_TrackRGBD++ << endl;
+        cout << endl << "[info] System::TrackRGBD begin-----------------------------------------------------------"
+             << count_System_TrackRGBD++ << endl;
 
 //        if (mSensor != RGBD) {
 //            cerr << "ERROR: you called TrackRGBD but input sensor was not set to RGBD." << endl;
@@ -260,9 +261,9 @@ namespace ORB_SLAM2 {
         list<ORB_SLAM2::KeyFrame *>::iterator lRit = mpTracker->mlpReferences.begin();
         list<double>::iterator lT = mpTracker->mlFrameTimes.begin();
         list<bool>::iterator lbL = mpTracker->mlbLost.begin();
-        for (list<cv::Mat>::iterator lit = mpTracker->mlRelativeFramePoses.begin(),
-                     lend = mpTracker->mlRelativeFramePoses.end();
-             lit != lend; lit++, lRit++, lT++, lbL++) {
+        for (list<cv::Mat>::iterator lit = mpTracker->mlRelativeFramePoses.begin(), lend = mpTracker->mlRelativeFramePoses.end();
+             lit != lend;
+             lit++, lRit++, lT++, lbL++) {
             if (*lbL)
                 continue;
 
